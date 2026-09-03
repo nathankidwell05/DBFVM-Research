@@ -1,0 +1,16 @@
+.DS_Store
+*.asv
+*.m~
+*.mat
+*.fig
+*.mlx
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+python/outputs/
+matlab/**/results/*.png
+matlab/**/results/*.csv
+matlab/**/results/*.mat
+~$*
