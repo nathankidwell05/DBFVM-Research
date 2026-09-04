@@ -24,6 +24,8 @@ tEnd = 0.15;                                        % final comparison time
 thetaFinal = 1.20;                                  % final generalized-minmod setting
 
 Nx = 50000;                                         % production resolution; use 10000 for a faster comparison
+nxText = getenv('DBM_NX');                          % optional resolution override for a documented comparison run
+if ~isempty(nxText); Nx = str2double(nxText); end   % keep the published default unless DBM_NX is supplied
 Lx = 20.0;                                          % long domain keeps waves away from the boundaries
 dx = Lx/Nx;                                         % finite-volume cell width
 x = ((1:Nx)'-0.5)*dx;                               % cell-center positions

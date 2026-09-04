@@ -1,16 +1,20 @@
-# Earlier JAX prototype
+# Earlier JAX Prototype
 
-This is the original 2D finite-volume DBM prototype. It uses a KT-style D2V9
-model on a planar Sod problem and includes an exact Euler Riemann comparison.
-It is useful for architecture and regression work, but the MATLAB D1V5 solver
-is the current reference implementation.
+This directory preserves the early JAX finite-volume D2V9 prototype created
+before the project moved to the comment-heavy MATLAB workflow. It is retained
+to document the project history and possible future vectorization ideas.
+
+It is **not** the current reference solver, and its output is **not** used as
+validation evidence in this repository. The validated work and reported
+numerical results come from `matlab/d1v5/`.
+
+To run the exploratory example:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e ".[test]"
+pip install -e .
 python examples/run_sod.py
-pytest
 ```
 
 Generated files are written to `outputs/` and are not committed.
