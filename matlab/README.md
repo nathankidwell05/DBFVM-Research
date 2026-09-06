@@ -11,7 +11,6 @@ and a record of how each numerical operation works.
 | 2 | [`d1v5/d1v5_sodshock_limiter_history_comparison.m`](d1v5/d1v5_sodshock_limiter_history_comparison.m) | Compare every limiter developed during the project under matched settings |
 | 3 | [`d1v5/run_d1v5_gminmod_L2_convergence.m`](d1v5/run_d1v5_gminmod_L2_convergence.m) | Run the four-grid L2 study |
 | 4 | [`d1v5/generate_documentation_figures.m`](d1v5/generate_documentation_figures.m) | Generate extra error and limiter-comparison figures from saved MATLAB runs |
-| 5 | [`d2v9/d2v9_kt_muscl_sod_teaching.m`](d2v9/d2v9_kt_muscl_sod_teaching.m) | Inspect the current two-dimensional extension |
 
 ## Main D1V5 solver
 
@@ -155,22 +154,6 @@ This is an expensive calculation because it runs the reference solver at
 `Nx = 6250, 12500, 25000, 50000`. It writes CSV, MAT, and PNG outputs to the
 top-level `results/` directory. The committed CSV and figure record the
 completed study, so rerunning is only necessary after changing the solver.
-
-## D2V9 status
-
-The D2V9 program expands storage, moments, and fluxes into x and y. It uses a
-KT-style nine-velocity equilibrium, MUSCL-minmod reconstruction in both
-directions, BGK collision, and a planar Sod initial condition.
-
-It is not yet equivalent to a validated 2D research solver. Before reporting
-its results, check:
-
-1. every required equilibrium moment against the published KT equations;
-2. conservation of mass, x/y momentum, and energy;
-3. uniformity across y for a planar x-directed Sod problem;
-4. agreement of the centerline with the validated D1V5/Euler result;
-5. grid convergence in both x and y; and
-6. sensitivity to `tau`, CFL, and boundary placement.
 
 ## Archive
 

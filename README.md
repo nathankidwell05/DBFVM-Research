@@ -19,10 +19,10 @@ to two-dimensional shock tubes and supersonic flow over a wedge.
 Possible airfoil applications
 ```
 
-The project is currently at the first transition: the one-dimensional solver
-has been implemented and compared with the exact Sod solution, while the
-two-dimensional D2V9 program is still a teaching prototype that requires
-formal validation.
+The project is currently completing the one-dimensional stage. The D1V5
+solver has been implemented and compared with the exact Sod solution. A
+two-dimensional solver has not yet been selected or implemented as part of the
+reported research.
 
 | Part of the project | Current status |
 |---|---|
@@ -31,7 +31,6 @@ formal validation.
 | Limiter comparison | Minmod, MC, two hybrid attempts, and generalized minmod compared |
 | Error measurement | Global and wave-region L1/L2 errors plus temperature peak excess |
 | Grid study | Completed on 6,250–50,000 cells; improvement is not cleanly second order |
-| KT-D2V9 planar Sod solver | Implemented as an unvalidated teaching prototype |
 | Wedge solver | Not yet implemented |
 
 ## Why begin with the Sod shock tube?
@@ -222,7 +221,6 @@ and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
 | Path | Contents |
 |---|---|
 | [`matlab/d1v5/`](matlab/d1v5/) | Current 1D solver, limiter comparison, and convergence driver |
-| [`matlab/d2v9/`](matlab/d2v9/) | Comment-heavy 2D planar-Sod prototype; not yet fully validated |
 | [`matlab/archive/`](matlab/archive/) | Earlier limiter implementations retained to document decisions |
 | [`results/`](results/) | Versioned figures and machine-readable numerical results |
 | [`reports/`](reports/) | Detailed convergence and limiter-development explanations |
@@ -238,16 +236,16 @@ and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
 - The long domain keeps the waves away from the boundaries. Changing `Lx`
   without changing `Nx` also changes `dx`, so domain and resolution studies
   must be separated carefully.
-- The D2V9 program has not yet completed moment, conservation, y-uniformity,
-  and grid-convergence checks.
+- A two-dimensional discrete-velocity model and solver have not yet been
+  selected and validated.
 - No wedge or airfoil result is claimed in this repository yet.
 
 ## Next controlled work
 
 1. Repeat the D1V5 study while scaling `tau` and the time step with `dx`.
 2. Measure individual rarefaction, contact, and shock position/width errors.
-3. Validate the D2V9 equilibrium moments and recover the one-dimensional
-   solution identically on every y-row.
+3. Select a published two-dimensional discrete-velocity model and verify all
+   required equilibrium moments before implementing it.
 4. Perform a genuine two-dimensional shock-tube test.
 5. Add wall and inflow/outflow boundary conditions for a 2D wedge.
 6. Compare the computed oblique-shock angle with oblique-shock theory before

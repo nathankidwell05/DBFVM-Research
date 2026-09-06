@@ -174,18 +174,18 @@ exact-wave/grid alignment all contribute to the measured trend.
 
 ## 15. Current decision point
 
-The 1D solver is accurate enough to support a controlled move toward 2D, but
-one more 1D study should separate spatial and finite-relaxation effects by
-scaling `tau` and `dt` with `dx`. The D2V9 planar case should then reproduce the
-same x-directed solution uniformly across y before any wedge geometry is
-introduced.
+The 1D solver is accurate enough to support planning a controlled move toward
+2D, but one more 1D study should separate spatial and finite-relaxation effects
+by scaling `tau` and `dt` with `dx`. The two-dimensional discrete-velocity
+model should be selected from published work and its required moments derived
+before implementation begins.
 
 ## 16. Validation required before a wedge claim
 
 The next solver should pass, in order:
 
-1. published D2V9 equilibrium-moment checks;
-2. planar Sod y-uniformity and D1 reference agreement;
+1. published two-dimensional equilibrium-moment checks;
+2. planar shock-tube y-uniformity and D1 reference agreement;
 3. a genuinely two-dimensional shock-tube benchmark;
 4. conservation and grid studies;
 5. stable wall and inflow/outflow boundary tests; and
