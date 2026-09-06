@@ -49,12 +49,25 @@ Peak excess improved strongly through 25,000 cells but was not monotonic at 50,0
 
 ## Interpretation
 
-From 6,250 to 50,000 cells, the global L2 errors decreased by approximately:
+The percentage reductions below compare the two endpoints of the study: the
+coarsest grid (`Nx = 6,250`, `dx = 0.0032`) and the finest grid
+(`Nx = 50,000`, `dx = 0.0004`). They are **not** reductions measured at every
+refinement step. The calculation is
 
-- Density: 42.3%
-- Velocity: 54.0%
-- Pressure: 45.7%
-- Temperature: 48.0%
+```text
+percentage reduction = 100*(L2_coarse - L2_fine)/L2_coarse.
+```
+
+| Field | Coarse L2 (`Nx=6,250`) | Fine L2 (`Nx=50,000`) | Endpoint reduction |
+|---|---:|---:|---:|
+| Density | 1.960774e-3 | 1.131536e-3 | 42.3% |
+| Velocity | 8.419527e-3 | 3.871277e-3 | 54.0% |
+| Pressure | 1.883587e-3 | 1.023180e-3 | 45.7% |
+| Temperature | 4.674423e-3 | 2.428375e-3 | 48.0% |
+
+These endpoint percentages summarize the net change across three grid
+doublings. They do not imply monotonic improvement at each doubling; velocity
+L2, for example, increased slightly from `Nx=25,000` to `Nx=50,000`.
 
 The overall effective orders across all three grid doublings were approximately `0.264` for density, `0.374` for velocity, `0.293` for pressure, and `0.315` for temperature.
 

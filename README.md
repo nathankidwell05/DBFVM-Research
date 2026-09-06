@@ -186,6 +186,18 @@ A four-grid study used `Nx = 6250, 12500, 25000, 50000` while holding
 fixed. Density, pressure, and temperature L2 errors decreased on every grid.
 Velocity improved through 25,000 cells and then increased slightly at 50,000.
 
+The percentage reductions below are **endpoint comparisons from the coarsest
+grid (`Nx=6250`) to the finest grid (`Nx=50000`)**. They are not reductions at
+each individual refinement step. Each value is calculated as
+`100*(L2_coarse-L2_fine)/L2_coarse`.
+
+| Field | L2 at `Nx=6250` | L2 at `Nx=50000` | Coarse-to-fine reduction |
+|---|---:|---:|---:|
+| Density | `1.960774e-3` | `1.131536e-3` | `42.3%` |
+| Velocity | `8.419527e-3` | `3.871277e-3` | `54.0%` |
+| Pressure | `1.883587e-3` | `1.023180e-3` | `45.7%` |
+| Temperature | `4.674423e-3` | `2.428375e-3` | `48.0%` |
+
 The end-to-end effective orders were approximately:
 
 | Field | Effective order |

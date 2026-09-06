@@ -7,6 +7,8 @@
 - Added reproducible MATLAB post-processing for spatial error, limiter error
   bars, and the accuracy-versus-overshoot tradeoff.
 - Added three more figures to the main README and results guide.
+- Defined the reported 42–54% L2 reductions explicitly as endpoint comparisons
+  between `Nx=6,250` and `Nx=50,000`, including the underlying error values.
 
 ## 2026-09-03
 
