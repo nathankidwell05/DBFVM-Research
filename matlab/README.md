@@ -10,7 +10,8 @@ and a record of how each numerical operation works.
 | 1 | [`d1v5/d1v5_sodshock_gminmod_rk3.m`](d1v5/d1v5_sodshock_gminmod_rk3.m) | Run one KT-D1V5 Sod case and compare it with the exact solution |
 | 2 | [`d1v5/d1v5_sodshock_limiter_history_comparison.m`](d1v5/d1v5_sodshock_limiter_history_comparison.m) | Compare every limiter developed during the project under matched settings |
 | 3 | [`d1v5/run_d1v5_gminmod_L2_convergence.m`](d1v5/run_d1v5_gminmod_L2_convergence.m) | Run the four-grid L2 study |
-| 4 | [`d2v9/d2v9_kt_muscl_sod_teaching.m`](d2v9/d2v9_kt_muscl_sod_teaching.m) | Inspect the current two-dimensional extension |
+| 4 | [`d1v5/generate_documentation_figures.m`](d1v5/generate_documentation_figures.m) | Generate extra error and limiter-comparison figures from saved MATLAB runs |
+| 5 | [`d2v9/d2v9_kt_muscl_sod_teaching.m`](d2v9/d2v9_kt_muscl_sod_teaching.m) | Inspect the current two-dimensional extension |
 
 ## Main D1V5 solver
 
@@ -130,6 +131,19 @@ This runs minmod, MC, population-by-population hybrid limiting, shared
 macroscopic hybrid limiting, and generalized minmod with identical settings.
 It prints a table of global L1 error, wave-region L1 error, and temperature
 peak excess, then saves the complete workspace data.
+
+## Documentation figures
+
+After running both the main solver and limiter-history comparison, generate
+the additional spatial-error and tradeoff figures with:
+
+```matlab
+generate_documentation_figures
+```
+
+This script reads the two locally saved `.mat` files and exports three PNG
+figures to the top-level `results/` directory. It does not rerun the solver or
+change any numerical result.
 
 ## L2 grid study
 

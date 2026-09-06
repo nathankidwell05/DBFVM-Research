@@ -13,6 +13,9 @@ can be recreated from the MATLAB scripts.
 | `d1v5_limiter_history_Nx6250.png` | Density, velocity, pressure, and temperature for all five limiter versions |
 | `d1v5_temperature_limiter_comparison_Nx6250.png` | Enlarged view of limiter behavior near the temperature plateau |
 | `d1v5_limiter_history_Nx6250_metrics.csv` | Matched global/wave L1 errors and peak excess for each limiter |
+| `d1v5_limiter_error_bars_Nx6250.png` | Global and wave-region L1 errors for all fields and limiters |
+| `d1v5_limiter_tradeoff_Nx6250.png` | Temperature accuracy-versus-overshoot tradeoff and normalized global errors |
+| `d1v5_gminmod_absolute_error_Nx6250.png` | Location and magnitude of generalized-minmod absolute error |
 | `d1v5_gminmod_L2_convergence_plot.png` | Whole-domain and wave-region L2 errors over four grids |
 | `d1v5_gminmod_L2_convergence_results.csv` | Full convergence table, observed orders, runtime, and peak excess |
 

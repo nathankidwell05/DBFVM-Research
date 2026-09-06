@@ -160,6 +160,25 @@ universally optimal limiter.
 
 ![Temperature overshoot comparison](results/d1v5_temperature_limiter_comparison_Nx6250.png)
 
+The next figure separates whole-domain and wave-region error. The wave-region
+bars are larger because they do not average the error over the long,
+undisturbed parts of the tube.
+
+![Limiter L1 error comparison](results/d1v5_limiter_error_bars_Nx6250.png)
+
+The tradeoff plot makes the limiter decision more direct: moving left reduces
+wave-region temperature error, while moving downward reduces overshoot. MC
+moves farthest left but also moves sharply upward; generalized minmod remains
+between the minmod and MC extremes.
+
+![Limiter accuracy and overshoot tradeoff](results/d1v5_limiter_tradeoff_Nx6250.png)
+
+Finally, the spatial error profiles show where the generalized-minmod result
+differs from the exact solution. Most error is concentrated around wave edges
+rather than in the constant regions.
+
+![Spatial absolute-error profiles](results/d1v5_gminmod_absolute_error_Nx6250.png)
+
 ## Grid-convergence finding
 
 A four-grid study used `Nx = 6250, 12500, 25000, 50000` while holding
@@ -195,7 +214,6 @@ and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
 | [`matlab/archive/`](matlab/archive/) | Earlier limiter implementations retained to document decisions |
 | [`results/`](results/) | Versioned figures and machine-readable numerical results |
 | [`reports/`](reports/) | Detailed convergence and limiter-development explanations |
-| [`python/`](python/) | Earlier exploratory JAX prototype; not part of current validation evidence |
 | [`SOURCES.md`](SOURCES.md) | Papers and books used for model and numerical-method decisions |
 | [`METHODOLOGY.md`](METHODOLOGY.md) | Chronological explanation of what was attempted and why |
 

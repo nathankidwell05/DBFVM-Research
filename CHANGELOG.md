@@ -1,11 +1,17 @@
 # Project snapshot history
 
+## 2026-09-05
+
+- Removed unrelated prototype code so the repository contains only the MATLAB
+  research workflow.
+- Added reproducible MATLAB post-processing for spatial error, limiter error
+  bars, and the accuracy-versus-overshoot tradeoff.
+- Added three more figures to the main README and results guide.
+
 ## 2026-09-03
 
 - Expanded the main and MATLAB READMEs into a complete project guide.
 - Added a chronological methodology and decision record.
-- Clarified that the earlier JAX prototype is historical material and that all
-  reported validation evidence comes from the MATLAB work.
 - Added a controlled `DBM_NX` override to the limiter-history script.
 - Regenerated the MATLAB D1V5 reference and five-limiter comparison at
   `Nx=6250`.
@@ -21,9 +27,8 @@
 - Preserved the full-MC and hybrid-limiter experiments under `matlab/archive/`.
 - Added the D2V9 planar-Sod teaching prototype with an explicit unvalidated
   status.
-- Added the earlier JAX D2V9 exploratory prototype as historical material.
 - Removed dead positivity-repair and scalar-limiter code from the reference
   solver; nonphysical states are rejected rather than silently repaired.
 - Standardized the reference plot as exact black solid and generalized minmod
   green dashed.
-- Added concise README files and ignored generated MATLAB/Python artifacts.
+- Added concise README files and ignored generated MATLAB artifacts.

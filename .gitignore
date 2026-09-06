@@ -4,11 +4,6 @@
 *.mat
 *.fig
 *.mlx
-__pycache__/
-*.py[cod]
-.ruff_cache/
-.venv/
-python/outputs/
 matlab/**/results/*.png
 matlab/**/results/*.csv
 matlab/**/results/*.mat
