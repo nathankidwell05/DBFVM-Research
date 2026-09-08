@@ -7,6 +7,9 @@
   switching, and the shortcomings of every method.
 - Explained how the fixed Sod wave window was selected and why wave-region
   errors are reported separately from whole-domain errors.
+- Expanded the limiter guide with the complete code path, numerical examples,
+  MATLAB decision logic, and plain-language explanations of each method's
+  weaknesses.
 
 ## 2026-09-05
 
