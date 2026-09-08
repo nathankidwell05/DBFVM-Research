@@ -34,6 +34,32 @@ can recreate them from the MATLAB scripts.
 - **Observed order:** change in error between two grid spacings, computed as
   `log(E_coarse/E_fine)/log(dx_coarse/dx_fine)`.
 
+### How I chose the wave region
+
+The easiest way I think about this is that global L1 grades the entire graph,
+while wave-region L1 zooms in on the part where something is actually
+happening. Most of the long shock tube is still at its original constant
+state. If I average over all of those easy cells, they can make the total error
+look better than the fit around the rarefaction, contact, and shock really is.
+
+For the current case, the diaphragm starts at `x0 = 10` and the solution is
+measured at `tEnd = 0.15`. The exact Sod solution tells me how far the three
+waves have traveled by that time. I use the slightly wider interval
+
+```text
+x0 - 0.30 <= x <= x0 + 0.40
+```
+
+or `9.70 <= x <= 10.40`. That interval contains the rarefaction, contact, and
+shock, plus a little extra space for numerical smearing around their edges.
+The wave-region L1 error is just the normal average absolute error calculated
+inside that window.
+
+The solver is **not automatically detecting the wave region**. This fixed
+window was selected for the current initial conditions and final time. If I
+change `x0`, `tEnd`, or the left and right gas states, I need to calculate the
+new exact wave locations and update the window.
+
 ## Reproducibility note
 
 I regenerated the `Nx=6250` reference and limiter figures on September 3,

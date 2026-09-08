@@ -5,6 +5,8 @@
 - Added a limiter and stability guide covering first-order upwind, minmod, MC,
   both hybrid attempts, generalized minmod, physical-state detection, retry
   switching, and the shortcomings of every method.
+- Explained how the fixed Sod wave window was selected and why wave-region
+  errors are reported separately from whole-domain errors.
 
 ## 2026-09-05
 
