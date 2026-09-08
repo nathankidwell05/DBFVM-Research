@@ -11,7 +11,7 @@ population value on both faces. For one population, I first calculate
 
 ```text
 dL = f(i)   - f(i-1)   change on the left side of cell i
-dR = f(i+1) - f(i)     change on the right side of cell 
+dR = f(i+1) - f(i)     change on the right side of cell i
 ```
 
 If `dL` and `dR` have the same sign, the population is still moving in the
