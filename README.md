@@ -28,8 +28,7 @@ implemented the two-dimensional velocity model yet.
 | KT-D1V5 Sod solver | Working MATLAB reference implementation |
 | Exact Euler comparison | Implemented for density, velocity, pressure, and temperature |
 | Limiter comparison | Minmod, MC, two hybrid attempts, and generalized minmod compared |
-| Error measurement | Global and wave-region L1/L2 errors plus temperature peak excess |
-| Grid study | Completed on 6,250–50,000 cells; improvement is not cleanly second order |
+| Error measurement | Global and wave-region L1 errors plus temperature peak excess |
 | Wedge solver | Not yet implemented |
 
 ## Why begin with the Sod shock tube?
@@ -178,51 +177,14 @@ tube.
 
 ![Spatial absolute-error profiles](results/d1v5_gminmod_absolute_error_Nx6250.png)
 
-## Grid-convergence finding
-
-A four-grid study used `Nx = 6250, 12500, 25000, 50000` while holding
-`Lx = 20`, `tau = 5e-5`, `CFL = 0.10`, `tEnd = 0.15`, and `theta = 1.20`
-fixed. Density, pressure, and temperature L2 errors decreased on every grid.
-Velocity improved through 25,000 cells and then increased slightly at 50,000.
-
-The percentage reductions below compare only the **coarsest grid
-(`Nx=6250`) with the finest grid (`Nx=50000`)**. They are not the reduction at
-every refinement step. I calculated each value as
-`100*(L2_coarse-L2_fine)/L2_coarse`.
-
-| Field | L2 at `Nx=6250` | L2 at `Nx=50000` | Coarse-to-fine reduction |
-|---|---:|---:|---:|
-| Density | `1.960774e-3` | `1.131536e-3` | `42.3%` |
-| Velocity | `8.419527e-3` | `3.871277e-3` | `54.0%` |
-| Pressure | `1.883587e-3` | `1.023180e-3` | `45.7%` |
-| Temperature | `4.674423e-3` | `2.428375e-3` | `48.0%` |
-
-The end-to-end effective orders were approximately:
-
-| Field | Effective order |
-|---|---:|
-| Density | `0.264` |
-| Velocity | `0.374` |
-| Pressure | `0.293` |
-| Temperature | `0.315` |
-
-These values do **not** show clean second-order convergence. Shocks and
-contacts lower the measured order. I also kept `tau` fixed, so this study mixes
-spatial error with effects from using a finite relaxation time.
-
-![L2 grid convergence](results/d1v5_gminmod_L2_convergence_plot.png)
-
-See the [full convergence report](reports/d1v5_gminmod_L2_convergence_report.md)
-and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
-
 ## Repository map
 
 | Path | Contents |
 |---|---|
-| [`matlab/d1v5/`](matlab/d1v5/) | Current 1D solver, limiter comparison, and convergence driver |
+| [`matlab/d1v5/`](matlab/d1v5/) | Current 1D solver, limiter comparison, and figure-generation code |
 | [`matlab/archive/`](matlab/archive/) | Earlier limiter implementations retained to document decisions |
 | [`results/`](results/) | Versioned figures and machine-readable numerical results |
-| [`reports/`](reports/) | Detailed convergence and limiter-development explanations |
+| [`reports/`](reports/) | Detailed limiter-development explanations |
 | [`LIMITERS.md`](LIMITERS.md) | How each limiter detects risky gradients, switches behavior, and can fail |
 | [`SOURCES.md`](SOURCES.md) | Papers and books used for model and numerical-method decisions |
 | [`METHODOLOGY.md`](METHODOLOGY.md) | Chronological explanation of what was attempted and why |
@@ -242,7 +204,7 @@ and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
 
 ## What I plan to do next
 
-1. Repeat the D1V5 study while scaling `tau` and the time step with `dx`.
+1. Test how the choices of `tau` and time step affect the 1D result.
 2. Measure individual rarefaction, contact, and shock position/width errors.
 3. Select a published two-dimensional discrete-velocity model and verify all
    required equilibrium moments before implementing it.

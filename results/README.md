@@ -16,8 +16,6 @@ can recreate them from the MATLAB scripts.
 | `d1v5_limiter_error_bars_Nx6250.png` | Global and wave-region L1 errors for all fields and limiters |
 | `d1v5_limiter_tradeoff_Nx6250.png` | Temperature accuracy-versus-overshoot tradeoff and normalized global errors |
 | `d1v5_gminmod_absolute_error_Nx6250.png` | Location and magnitude of generalized-minmod absolute error |
-| `d1v5_gminmod_L2_convergence_plot.png` | Whole-domain and wave-region L2 errors over four grids |
-| `d1v5_gminmod_L2_convergence_results.csv` | Full convergence table, observed orders, runtime, and peak excess |
 
 ## What the error measurements mean
 
@@ -26,13 +24,8 @@ can recreate them from the MATLAB scripts.
   this number look smaller than the error around the waves.
 - **Wave-region L1:** the same calculation, but only on
   `x0-0.30 <= x <= x0+0.40`, where the waves are located.
-- **Global L2:** the root-mean-square difference over the whole domain. It
-  gives more weight to large local errors than L1 does.
-- **Wave-region L2:** root-mean-square difference restricted to the wave zone.
 - **Temperature peak excess:** maximum numerical temperature minus the exact
   maximum temperature in the wave zone. Positive means overshoot.
-- **Observed order:** change in error between two grid spacings, computed as
-  `log(E_coarse/E_fine)/log(dx_coarse/dx_fine)`.
 
 ### How I chose the wave region
 
@@ -63,6 +56,5 @@ new exact wave locations and update the window.
 ## Reproducibility note
 
 I regenerated the `Nx=6250` reference and limiter figures on September 3,
-2026 from the committed MATLAB code. The four-grid files contain the finished
-`Nx=6250–50000` study. Runtime depends on the computer. I only compare the
-error values when the physical and numerical parameters match.
+2026 from the committed MATLAB code. Runtime depends on the computer. I only
+compare the error values when the physical and numerical parameters match.

@@ -16,7 +16,7 @@ set(0,'DefaultFigureVisible','on');  % show the final comparison and temperature
 %% Physical Parameters
 gamma = 1.4;           % ratio of specific heats for an air-like ideal gas
 b = 2/(gamma - 1);     % internal degrees of freedom parameter; gamma=1.4 gives b=5
-tau = 5.0e-5;          % BGK relaxation time used in the completed convergence study
+tau = 5.0e-5;          % BGK relaxation time used in the current reference setup
 CFL = 0.10;            % CFL number; smaller is safer, larger is faster but can be unstable
 tEnd = 0.15;           % final simulation time; keep short enough that waves do not hit boundaries
 mainLimiter = "gminmod";  % generalized minmod provides a controlled compromise between minmod and standard MC
@@ -27,7 +27,7 @@ tauText = getenv('DBM_TAU'); % read an optional relaxation time supplied by a co
 if ~isempty(tauText); tau = str2double(tauText); end % override the default only when requested
 
 %% Domain
-Nx = 50000;               % validated high-resolution grid used in the completed L2 study
+Nx = 50000;               % high-resolution grid used in the current reference setup
 nxText = getenv('DBM_NX'); % optionally override the resolution for a controlled study
 if ~isempty(nxText); Nx = str2double(nxText); end % apply the requested resolution
 Lx = 20.0;              % length of the shock tube

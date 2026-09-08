@@ -143,8 +143,6 @@ The solver reports:
 
 - global L1 error for an overall average difference;
 - wave-region L1 error so undisturbed domain length does not hide wave error;
-- global and wave-region L2 error for stronger weighting of larger local
-  differences;
 - temperature L-infinity error for the worst local temperature difference;
 - signed temperature peak excess and percentage; and
 - retry and fallback counts as stability diagnostics.
@@ -162,17 +160,7 @@ There is an important control issue: if `Nx` stays fixed while `Lx` increases,
 then `dx` also increases and the simulation becomes spatially coarser. A clean
 boundary study should increase `Nx` with `Lx` so `dx` remains fixed.
 
-## 14. Perform the grid study
-
-The generalized-minmod solver was run at 6,250, 12,500, 25,000, and 50,000
-cells. Most L2 errors decreased with refinement, but the observed order was
-only about 0.26–0.37 and finest-grid velocity error increased slightly.
-
-The study therefore supports grid improvement, not formal second-order
-convergence. Discontinuities, fixed relaxation time, time-step behavior, and
-exact-wave/grid alignment all contribute to the measured trend.
-
-## 15. Current decision point
+## 14. Current decision point
 
 The 1D solver is accurate enough to support planning a controlled move toward
 2D, but one more 1D study should separate spatial and finite-relaxation effects
@@ -180,7 +168,7 @@ by scaling `tau` and `dt` with `dx`. The two-dimensional discrete-velocity
 model should be selected from published work and its required moments derived
 before implementation begins.
 
-## 16. Validation required before a wedge claim
+## 15. Validation required before a wedge claim
 
 The next solver should pass, in order:
 

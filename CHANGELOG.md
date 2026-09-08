@@ -15,8 +15,6 @@
 - Added reproducible MATLAB post-processing for spatial error, limiter error
   bars, and the accuracy-versus-overshoot tradeoff.
 - Added three more figures to the main README and results guide.
-- Defined the reported 42–54% L2 reductions explicitly as endpoint comparisons
-  between `Nx=6,250` and `Nx=50,000`, including the underlying error values.
 
 ## 2026-09-03
 
@@ -26,14 +24,12 @@
 - Regenerated the MATLAB D1V5 reference and five-limiter comparison at
   `Nx=6250`.
 - Added three result figures and two machine-readable metric tables.
-- Added the existing four-grid L2 convergence figure beside its CSV table.
 
 ## 2026-09-02
 
 - Added the current KT-D1V5 generalized-minmod SSP-RK3 solver with clean file
   naming and validated defaults.
 - Added the matched five-limiter history comparison.
-- Added the four-grid L2 convergence driver, report, and CSV results.
 - Preserved the full-MC and hybrid-limiter experiments under `matlab/archive/`.
 - Removed dead positivity-repair and scalar-limiter code from the reference
   solver; nonphysical states are rejected rather than silently repaired.

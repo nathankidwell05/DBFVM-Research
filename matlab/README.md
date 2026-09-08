@@ -10,8 +10,7 @@ understand what every major step is doing.
 |---:|---|---|
 | 1 | [`d1v5/d1v5_sodshock_gminmod_rk3.m`](d1v5/d1v5_sodshock_gminmod_rk3.m) | Run one KT-D1V5 Sod case and compare it with the exact solution |
 | 2 | [`d1v5/d1v5_sodshock_limiter_history_comparison.m`](d1v5/d1v5_sodshock_limiter_history_comparison.m) | Compare every limiter developed during the project under matched settings |
-| 3 | [`d1v5/run_d1v5_gminmod_L2_convergence.m`](d1v5/run_d1v5_gminmod_L2_convergence.m) | Run the four-grid L2 study |
-| 4 | [`d1v5/generate_documentation_figures.m`](d1v5/generate_documentation_figures.m) | Generate extra error and limiter-comparison figures from saved MATLAB runs |
+| 3 | [`d1v5/generate_documentation_figures.m`](d1v5/generate_documentation_figures.m) | Generate extra error and limiter-comparison figures from saved MATLAB runs |
 
 ## Main D1V5 solver
 
@@ -148,17 +147,6 @@ generate_documentation_figures
 This script reads the two saved `.mat` files and exports three PNG figures to
 the top-level `results/` folder. It only makes figures; it does not rerun the
 solver or change the results.
-
-## L2 grid study
-
-```matlab
-convergenceTable = run_d1v5_gminmod_L2_convergence;
-```
-
-This takes a while because it runs the solver at `Nx = 6250, 12500, 25000,
-50000`. It writes CSV, MAT, and PNG outputs to the top-level `results/` folder.
-The finished results are already saved, so I only need to rerun this after I
-change something important in the solver.
 
 ## Archive
 
