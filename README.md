@@ -1,9 +1,9 @@
 # Finite-Volume Discrete Boltzmann Research
 
-This repository documents the development of a finite-volume discrete
-Boltzmann method (FVDBM) for compressible-flow problems. The immediate goal is
-to build and validate the numerical foundation in one dimension before moving
-to two-dimensional shock tubes and supersonic flow over a wedge.
+This repository is a record of my work on a finite-volume discrete Boltzmann
+method (FVDBM) for compressible flow. I am starting with a problem I can check
+carefully in one dimension, then building toward two-dimensional shock tubes
+and supersonic flow over a wedge.
 
 ## Research path
 
@@ -19,10 +19,9 @@ to two-dimensional shock tubes and supersonic flow over a wedge.
 Possible airfoil applications
 ```
 
-The project is currently completing the one-dimensional stage. The D1V5
-solver has been implemented and compared with the exact Sod solution. A
-two-dimensional solver has not yet been selected or implemented as part of the
-reported research.
+Right now I am finishing the one-dimensional stage. The D1V5 solver runs and
+can be compared directly with the exact Sod solution. I have not selected or
+implemented the two-dimensional velocity model yet.
 
 | Part of the project | Current status |
 |---|---|
@@ -49,10 +48,11 @@ Removing the diaphragm produces three different wave features:
 - a contact discontinuity moving right; and
 - a shock moving farther to the right.
 
-One short calculation therefore checks smooth transport, discontinuity
-capture, shock speed, thermodynamic recovery, stability, and boundary
-treatment. An exact inviscid Euler solution is also available, so numerical
-errors can be measured instead of judged only by how a graph looks.
+This gives me several useful tests in one problem: smooth transport, contact
+and shock capture, wave speed, pressure and temperature recovery, stability,
+and boundary treatment. There is also an exact inviscid Euler solution. That
+means I can calculate the error instead of only deciding whether the graph
+looks right.
 
 ## Current numerical model
 
@@ -77,11 +77,11 @@ df_i/dt + c_i df_i/dx = (f_i^eq - f_i)/tau.
 
 ### D1V5 does not mean lattice streaming
 
-`D1V5` describes the **velocity model**: one physical dimension and five
-discrete molecular velocities. The physical domain is still divided into
-finite-volume cells, and fluxes are computed at their faces. The populations
-are not required to jump exactly from one lattice node to another in one time
-step.
+`D1V5` only describes the **velocity model**: one physical dimension and five
+discrete molecular velocities. It does not automatically make the code a
+lattice Boltzmann solver. I still divide the domain into finite-volume cells
+and calculate fluxes at their faces. The populations do not have to move
+exactly from one lattice node to the next in one time step.
 
 ## Run the MATLAB code
 
@@ -95,9 +95,9 @@ cd matlab/d1v5
 d1v5_sodshock_gminmod_rk3
 ```
 
-The published default uses `Nx = 50000`, `Lx = 20`, `tau = 5e-5`,
-`CFL = 0.10`, `tEnd = 0.15`, and `theta = 1.20`. For a faster learning run,
-override the grid without editing the file:
+The saved setup uses `Nx = 50000`, `Lx = 20`, `tau = 5e-5`, `CFL = 0.10`,
+`tEnd = 0.15`, and `theta = 1.20`. To do a faster test without editing the
+file, I can temporarily override the grid:
 
 ```matlab
 setenv('DBM_NX','6250')
@@ -110,10 +110,10 @@ Additional workflows and output definitions are explained in the
 
 ## Reproduced one-dimensional result
 
-The following result was regenerated from the public MATLAB code using
-`Nx = 6250`. The run completed 12,000 accepted time steps in 39.96 seconds on
-the development machine, with zero retries and zero fallback-limiters. Runtime
-is machine-dependent; the error values are the useful comparison.
+I regenerated the result below from the saved MATLAB code using `Nx = 6250`.
+It completed 12,000 accepted steps in 39.96 seconds on my computer, with no
+retries and no fallback limiters. The runtime will change from one computer to
+another, so the error values are the more useful comparison.
 
 | Global L1 error | Value |
 |---|---:|
@@ -143,7 +143,7 @@ the reconstruction limiter changed.
 | Macroscopic hybrid | `2.787301e-4` | `7.954627e-3` | `1.005029e-3` |
 | Generalized minmod, `theta=1.20` | `2.222085e-4` | `6.341566e-3` | `2.048193e-3` |
 
-The comparison does **not** identify one limiter as best in every metric:
+There was no limiter that won every comparison:
 
 - MC had the smallest average errors, but its peak excess was almost four
   times the generalized-minmod value.
@@ -152,29 +152,29 @@ The comparison does **not** identify one limiter as best in every metric:
 - Generalized minmod reduced MC's peak excess by about 75% while reducing all
   four global L1 errors by about 17–20% relative to minmod.
 
-This is why `theta = 1.20` is the present compromise, not a claim that it is a
-universally optimal limiter.
+That is why I currently use `theta = 1.20`. It is a compromise for this test,
+not proof that it is the best setting for every flow problem.
 
 ![Limiter development comparison](results/d1v5_limiter_history_Nx6250.png)
 
 ![Temperature overshoot comparison](results/d1v5_temperature_limiter_comparison_Nx6250.png)
 
-The next figure separates whole-domain and wave-region error. The wave-region
-bars are larger because they do not average the error over the long,
-undisturbed parts of the tube.
+The next figure separates the error over the whole domain from the error only
+around the waves. The wave-region values are larger because the long, flat
+parts of the tube are no longer making the average look smaller.
 
 ![Limiter L1 error comparison](results/d1v5_limiter_error_bars_Nx6250.png)
 
-The tradeoff plot makes the limiter decision more direct: moving left reduces
-wave-region temperature error, while moving downward reduces overshoot. MC
-moves farthest left but also moves sharply upward; generalized minmod remains
-between the minmod and MC extremes.
+The tradeoff plot shows the decision more clearly. Moving left means less
+temperature error around the waves, while moving down means less overshoot.
+MC is farthest left, but it also moves much higher because of its overshoot.
+Generalized minmod stays between the minmod and MC results.
 
 ![Limiter accuracy and overshoot tradeoff](results/d1v5_limiter_tradeoff_Nx6250.png)
 
-Finally, the spatial error profiles show where the generalized-minmod result
-differs from the exact solution. Most error is concentrated around wave edges
-rather than in the constant regions.
+The spatial error plots show where my result differs from the exact solution.
+Most of the error is around the wave edges, not in the constant parts of the
+tube.
 
 ![Spatial absolute-error profiles](results/d1v5_gminmod_absolute_error_Nx6250.png)
 
@@ -185,9 +185,9 @@ A four-grid study used `Nx = 6250, 12500, 25000, 50000` while holding
 fixed. Density, pressure, and temperature L2 errors decreased on every grid.
 Velocity improved through 25,000 cells and then increased slightly at 50,000.
 
-The percentage reductions below are **endpoint comparisons from the coarsest
-grid (`Nx=6250`) to the finest grid (`Nx=50000`)**. They are not reductions at
-each individual refinement step. Each value is calculated as
+The percentage reductions below compare only the **coarsest grid
+(`Nx=6250`) with the finest grid (`Nx=50000`)**. They are not the reduction at
+every refinement step. I calculated each value as
 `100*(L2_coarse-L2_fine)/L2_coarse`.
 
 | Field | L2 at `Nx=6250` | L2 at `Nx=50000` | Coarse-to-fine reduction |
@@ -206,10 +206,9 @@ The end-to-end effective orders were approximately:
 | Pressure | `0.293` |
 | Temperature | `0.315` |
 
-These values do **not** support a formal second-order convergence claim. Shock
-and contact discontinuities reduce the observed order, and the fixed
-relaxation time means the study mixes spatial error with finite-`tau` model
-effects.
+These values do **not** show clean second-order convergence. Shocks and
+contacts lower the measured order. I also kept `tau` fixed, so this study mixes
+spatial error with effects from using a finite relaxation time.
 
 ![L2 grid convergence](results/d1v5_gminmod_L2_convergence_plot.png)
 
@@ -224,23 +223,24 @@ and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
 | [`matlab/archive/`](matlab/archive/) | Earlier limiter implementations retained to document decisions |
 | [`results/`](results/) | Versioned figures and machine-readable numerical results |
 | [`reports/`](reports/) | Detailed convergence and limiter-development explanations |
+| [`LIMITERS.md`](LIMITERS.md) | How each limiter detects risky gradients, switches behavior, and can fail |
 | [`SOURCES.md`](SOURCES.md) | Papers and books used for model and numerical-method decisions |
 | [`METHODOLOGY.md`](METHODOLOGY.md) | Chronological explanation of what was attempted and why |
 
-## Important limitations
+## What this work does not prove yet
 
-- The current validated result is one-dimensional.
+- The result I have validated so far is one-dimensional.
 - The exact curve is an inviscid Euler solution, while the DBM calculation has
   finite relaxation time. The reported difference is therefore not purely
   spatial discretization error.
 - The long domain keeps the waves away from the boundaries. Changing `Lx`
   without changing `Nx` also changes `dx`, so domain and resolution studies
   must be separated carefully.
-- A two-dimensional discrete-velocity model and solver have not yet been
-  selected and validated.
-- No wedge or airfoil result is claimed in this repository yet.
+- I have not selected and validated the two-dimensional discrete-velocity
+  model yet.
+- I do not have a validated wedge or airfoil result yet.
 
-## Next controlled work
+## What I plan to do next
 
 1. Repeat the D1V5 study while scaling `tau` and the time step with `dx`.
 2. Measure individual rarefaction, contact, and shock position/width errors.
@@ -253,6 +253,6 @@ and [CSV table](results/d1v5_gminmod_L2_convergence_results.csv).
 
 ## References
 
-The model, limiter, finite-volume, and benchmark sources are collected in
-[`SOURCES.md`](SOURCES.md). Equations should be traced to the cited paper
-rather than to comments or summaries alone.
+I collected the model, limiter, finite-volume, and benchmark sources in
+[`SOURCES.md`](SOURCES.md). The comments help explain the code, but the cited
+papers are the source for the actual equations.

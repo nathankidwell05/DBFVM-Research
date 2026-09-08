@@ -1,7 +1,8 @@
 # MATLAB Solver Guide
 
-The MATLAB code is intentionally comment-heavy. It is both a research solver
-and a record of how each numerical operation works.
+I intentionally left a lot of comments in the MATLAB code. I wanted the files
+to work as solvers, but I also wanted to be able to come back later and
+understand what every major step is doing.
 
 ## Recommended order
 
@@ -21,7 +22,7 @@ cd matlab/d1v5
 d1v5_sodshock_gminmod_rk3
 ```
 
-The script performs the following sequence:
+The main script works through the problem in this order:
 
 1. Defines the gas, grid, time, and limiter parameters.
 2. Creates the left and right Sod states.
@@ -54,8 +55,8 @@ The script performs the following sequence:
 
 ### Controlled overrides
 
-The reference solver accepts environment-variable overrides. MATLAB's
-`setenv` is useful because the script begins with `clear`.
+The reference solver lets me override a few parameters with environment
+variables. I use `setenv` because the script starts with `clear`.
 
 ```matlab
 setenv('DBM_NX','6250')
@@ -69,13 +70,13 @@ setenv('DBM_THETA','')
 setenv('DBM_TAU','')
 ```
 
-Only change one controlled variable at a time when measuring its effect.
+When I am measuring what a parameter does, I only change one at a time.
 
 ## How the finite-volume transport works
 
-Each physical cell stores five population values. For population `q`, MUSCL
-uses the neighboring cell values to estimate a limited slope. That slope
-creates a left and right reconstructed value at each face.
+Each physical cell stores five population values. For one population `q`,
+MUSCL looks at neighboring cells and estimates a limited slope. I use that
+slope to reconstruct a value on the left and right side of the cell.
 
 - If `c(q) > 0`, the face receives the state reconstructed from the cell on
   its left because that population moves right.
@@ -91,6 +92,10 @@ RHS = -flux divergence + (equilibrium - population)/tau.
 ```
 
 ## Generalized minmod
+
+I wrote out how every limiter works, how the hybrid versions decide to switch,
+and where each method falls short in the
+[limiter and stability guide](../LIMITERS.md).
 
 For left and right differences `dL` and `dR`, the implemented slope is
 
@@ -114,9 +119,10 @@ f2    = 3/4*f + 1/4*(f1 + dt*RHS(f1))
 f_new = 1/3*f + 2/3*(f2 + dt*RHS(f2))
 ```
 
-Boundary conditions and physical-state checks are applied at every stage.
-The solver reports how often a failed stage required a smaller time step or a
-more diffusive fallback limiter. The reproduced `Nx=6250` run required none.
+I apply the boundary conditions and check the physical state after every
+stage. If a trial stage gives a bad state, the solver reduces the time step
+and can fall back to a safer limiter. The reproduced `Nx=6250` run did not need
+any retries or fallbacks.
 
 ## Limiter-history comparison
 
@@ -126,10 +132,9 @@ d1v5_sodshock_limiter_history_comparison
 setenv('DBM_NX','')
 ```
 
-This runs minmod, MC, population-by-population hybrid limiting, shared
-macroscopic hybrid limiting, and generalized minmod with identical settings.
-It prints a table of global L1 error, wave-region L1 error, and temperature
-peak excess, then saves the complete workspace data.
+This runs minmod, MC, both hybrid attempts, and generalized minmod with the
+same setup. It prints global L1 error, wave-region L1 error, and temperature
+peak excess so I can compare more than just the appearance of the curves.
 
 ## Documentation figures
 
@@ -140,9 +145,9 @@ the additional spatial-error and tradeoff figures with:
 generate_documentation_figures
 ```
 
-This script reads the two locally saved `.mat` files and exports three PNG
-figures to the top-level `results/` directory. It does not rerun the solver or
-change any numerical result.
+This script reads the two saved `.mat` files and exports three PNG figures to
+the top-level `results/` folder. It only makes figures; it does not rerun the
+solver or change the results.
 
 ## L2 grid study
 
@@ -150,13 +155,13 @@ change any numerical result.
 convergenceTable = run_d1v5_gminmod_L2_convergence;
 ```
 
-This is an expensive calculation because it runs the reference solver at
-`Nx = 6250, 12500, 25000, 50000`. It writes CSV, MAT, and PNG outputs to the
-top-level `results/` directory. The committed CSV and figure record the
-completed study, so rerunning is only necessary after changing the solver.
+This takes a while because it runs the solver at `Nx = 6250, 12500, 25000,
+50000`. It writes CSV, MAT, and PNG outputs to the top-level `results/` folder.
+The finished results are already saved, so I only need to rerun this after I
+change something important in the solver.
 
 ## Archive
 
-The [`archive/`](archive/) directory preserves limiter versions that were
-important to the reasoning but were superseded. They are not recommended as
-starting points for new simulations.
+The [`archive/`](archive/) folder keeps the limiter versions that helped me
+figure out what was going wrong. They are there to show the development path,
+not because they are the best files to use for a new run.

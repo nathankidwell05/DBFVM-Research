@@ -1,5 +1,11 @@
 # Project snapshot history
 
+## 2026-09-08
+
+- Added a limiter and stability guide covering first-order upwind, minmod, MC,
+  both hybrid attempts, generalized minmod, physical-state detection, retry
+  switching, and the shortcomings of every method.
+
 ## 2026-09-05
 
 - Removed unrelated prototype code so the repository contains only the MATLAB

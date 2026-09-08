@@ -1,7 +1,8 @@
 # Limiter-development archive
 
-These MATLAB snapshots preserve unsuccessful or superseded stages of the 1D
-solver. They are kept so the numerical decisions remain reproducible.
+These are older versions of my one-dimensional solver. Some were unsuccessful
+and some were simply replaced by a better approach. I kept them because they
+show what I tried and why I changed the limiter.
 
 - `d1v5_sodshock_muscl_MC_RK3_before_error_metrics_patch.m`: full-MC stage
   before quantitative error and peak diagnostics.
@@ -11,5 +12,5 @@ solver. They are kept so the numerical decisions remain reproducible.
   sensor, still using an abrupt MC/minmod switch.
 - `test_shared_hybrid_sensor.m`: focused experiment for the shared sensor.
 
-The current method is generalized minmod with `theta = 1.20`, located in
-`../d1v5/`.
+The version I currently use is generalized minmod with `theta = 1.20`. It is
+in `../d1v5/`.
