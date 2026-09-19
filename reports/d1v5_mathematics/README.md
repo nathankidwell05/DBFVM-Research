@@ -1,5 +1,9 @@
 # Mathematics and physics of the KT-D1V5 solver
 
+**Start here:** [`d1v5_solver_simple_guide.pdf`](d1v5_solver_simple_guide.pdf) is a
+16-page plain-language version covering the same ideas and results without the
+derivations. The full technical report is described below.
+
 [`d1v5_solver_mathematics.pdf`](d1v5_solver_mathematics.pdf) explains, without
 reference to code, the mathematics and physics behind the one-dimensional
 KT-D1V5 finite-volume discrete Boltzmann solver: the BGK kinetic model, the
@@ -16,6 +20,7 @@ then reports and interprets:
 ## Build
 
 ```bash
+tectonic d1v5_solver_simple_guide.tex
 tectonic d1v5_solver_mathematics.tex
 ```
 
