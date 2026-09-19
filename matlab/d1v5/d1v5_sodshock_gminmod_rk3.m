@@ -27,6 +27,8 @@ tauText = getenv('DBM_TAU'); % read an optional relaxation time supplied by a co
 if ~isempty(tauText); tau = str2double(tauText); end % override the default only when requested
 cflText = getenv('DBM_CFL'); % read an optional CFL number supplied by a controlled study
 if ~isempty(cflText); CFL = str2double(cflText); end % override the default only when requested
+limiterText = lower(strtrim(getenv('DBM_LIMITER'))); % optional limiter for method-comparison runs
+if any(strcmp(limiterText,{'firstorder','minmod','mc','gminmod'})); mainLimiter = string(limiterText); end % accept only implemented limiters
 
 %% Domain
 Nx = 50000;               % high-resolution grid used in the current reference setup
