@@ -16,8 +16,8 @@ set(0,'DefaultFigureVisible','on');  % show the final comparison and temperature
 %% Physical Parameters
 gamma = 1.4;           % ratio of specific heats for an air-like ideal gas
 b = 2/(gamma - 1);     % internal degrees of freedom parameter; gamma=1.4 gives b=5
-tau = 5.0e-5;          % BGK relaxation time used in the current reference setup
-CFL = 0.10;            % CFL number; smaller is safer, larger is faster but can be unstable
+tau = 5.0e-6;          % BGK relaxation time (September 18, 2026 study; earlier reference setup used 5e-5)
+CFL = 0.025;           % CFL number (September 18, 2026 study; earlier reference setup used 0.10)
 tEnd = 0.15;           % final simulation time; keep short enough that waves do not hit boundaries
 mainLimiter = "gminmod";  % generalized minmod provides a controlled compromise between minmod and standard MC
 limiterTheta = 1.2;       % theta=1 is minmod; theta=2 is MC; 1.2 adds sharpness while staying conservative
@@ -25,6 +25,8 @@ thetaText = getenv('DBM_THETA'); % read an optional theta supplied by a controll
 if ~isempty(thetaText); limiterTheta = str2double(thetaText); end % override the default only when requested
 tauText = getenv('DBM_TAU'); % read an optional relaxation time supplied by a controlled study
 if ~isempty(tauText); tau = str2double(tauText); end % override the default only when requested
+cflText = getenv('DBM_CFL'); % read an optional CFL number supplied by a controlled study
+if ~isempty(cflText); CFL = str2double(cflText); end % override the default only when requested
 
 %% Domain
 Nx = 50000;               % high-resolution grid used in the current reference setup
@@ -82,7 +84,7 @@ time = 0.0;                                  % current physical time
 step = 0;                                    % time-step counter
 plotEvery = 50;                              % update live plot every this many steps
 printEvery = 500;                            % print progress every this many steps
-makeLivePlot = Nx <= 5000;                   % automatically disable live plotting on expensive high-resolution runs
+makeLivePlot = Nx <= 5000 && ~strcmpi(getenv('DBM_DISABLE_LIVE_PLOT'),'1'); % no animation on large grids or automated studies
 plotSample = unique(round(linspace(1,Nx,min(Nx,2000)))); % sample points used for large-grid plotting
 maxRetry = 12;                                % maximum number of times to shrink dt if an RK stage fails
 minDt = 1.0e-12;                              % minimum allowed dt before stopping the run
@@ -95,7 +97,9 @@ fprintf('Main limiter: %s\n',char(mainLimiter));                      % print th
 fprintf('Generalized-minmod theta: %.3f\n',limiterTheta);             % print the slope-control value used in this run
 fprintf('Positivity repair: disabled\n');                             % reject nonphysical states instead of altering them
 fprintf('Grid: Nx=%d, dx=%.3e\n',Nx,dx);                             % print grid information
+fprintf('tau=%.3e, CFL=%.4f\n',tau,CFL);                              % print relaxation time and requested CFL
 fprintf('dt_adv=%.3e, dt_col=%.3e, dt=%.3e\n',dt_adv,dt_col,dtBase); % print time-step information
+fprintf('Effective CFL actually used = %.4e\n',maxSpeed*dtBase/dx);   % below CFL whenever the collision limit controls dt
 fprintf('Estimated steps: %.0f\n',ceil(tEnd/dtBase));                 % estimate number of time steps before starting
 
 %% Create Live Plot Handles
@@ -221,6 +225,9 @@ while time < tEnd-timeTolerance                % continue until final time is re
     time = time + dt;                                           % advance physical time
 
     %% Live Visualization
+    if makeLivePlot && ~(isgraphics(hRho) && isgraphics(hU) && isgraphics(hP) && isgraphics(hT)) % figure was closed
+        makeLivePlot = false;                                   % keep solving without animation
+    end
     if makeLivePlot && (mod(step,plotEvery) == 0 || time >= tEnd) % only update plot occasionally to save speed
         [rhoPlot,uPlot,TPlot,pPlot] = recover_macros_D1V5(f,b,c,h2); % recover macroscopic fields for plotting
         set(hRho,'YData',rhoPlot(plotSample));                  % update density line using sampled points

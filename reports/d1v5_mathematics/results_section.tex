@@ -1,0 +1,460 @@
+% ---------------------------------------------------------------------------
+% Results.  Every table body below is written by make_results_figures.m.
+% ---------------------------------------------------------------------------
+
+All runs use the configuration of \cref{tab:config}.  The convergence study was
+executed with \file{run_d1v5_gminmod_L2_convergence.m}.  The limiter comparison
+and the $\theta$-sweep use $N_x = 6250$ with the same $\tau$, CFL and final time.
+
+\subsection{Run summary and conservation}
+\label{sec:conservation_results}
+
+\Cref{tab:runs} confirms the time-step analysis of \cref{sec:dt}.  Every grid used
+$\Delta t = \tau/4$, the same $120{,}001$ steps (the last is a round-off-sized remainder that lands
+exactly on $t_{\mathrm{end}}$), and no retries or fallbacks.  \Cref{tab:conservation} checks the
+conservation argument of \cref{sec:conservation}.  Mass and energy are conserved to
+round-off relative to the discrete initial condition.  The momentum equals
+$(p_L-p_R)\,t_{\mathrm{end}} = 0.135$ to round-off, because the undisturbed boundary
+states exert the net pressure force $p_L - p_R$ on the domain.
+
+\begin{table}[ht]
+\centering
+\caption{Convergence runs: grid spacing, time step, effective Courant number
+$\nu_{\mathrm{eff}} = v_2\Delta t/\Delta x$, number of steps, and stability events.}
+\label{tab:runs}
+\small
+\begin{tabular}{@{}rccccrr@{}}
+\toprule
+$N_x$ & $\Delta x$ & $\Delta t$ & $\nu_{\mathrm{eff}}$ & steps & retries & fallbacks \\
+\midrule
+\tabinput{data/tab_conv_setup.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Conservation errors at $t=0.15$: $\sum_j q_j\Delta x$ minus its expected value
+(mass and energy: discrete initial value; momentum: $(p_L-p_R)t$).}
+\label{tab:conservation}
+\small
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$N_x$ & mass & momentum & energy \\
+\midrule
+\tabinput{data/tab_conservation.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Odd grid.}  $N_x=3125$ is odd, so the cell centre $x_{1563}$ coincides with
+the diaphragm.  The solver assigns cells with $x_j<x_0$ to the left state, so that
+cell receives the right state.  The discrete diaphragm therefore sits at
+$x_0-\Delta x/2$.  This is an $\ord(\Delta x)$ initial-condition offset present only
+on the coarsest grid.  It contributes to that grid's contact position error
+(\cref{tab:features}) and to the first pairwise orders.
+
+\subsection{The computed solution}
+
+\Cref{fig:finest} compares the $N_x = 50{,}000$ solution with the exact Euler
+solution, and \cref{fig:gridzoom} shows how each wave sharpens under refinement.
+The profiles are free of oscillations, and the four constant states are reproduced
+to plotting accuracy.  The pointwise error is concentrated in a few cells at each
+wave.  The largest errors occur at the shock in every variable and at the contact
+in $\rho$ and $T$.  The rarefaction head and tail show small corner errors.  The
+largest of these is a slight density undershoot just behind the tail
+(\cref{fig:gridzoom}a), which is limited in amplitude and shrinks with $\Delta x$.
+The maximum pointwise error does not decrease with $\Delta x$: it stays at
+$\approx0.08$ in $\rho$ and $0.34$--$0.63$ in $u$.  This is expected, because an
+$\ord(1)$ jump spread over a few cells always leaves an $\ord(1)$ error in the cell
+that straddles it.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{fig_solution_finest.pdf}
+\caption{Finest grid ($N_x=50{,}000$) versus the exact Euler solution at $t=0.15$
+(left) and the pointwise error (right), inside the error window.}
+\label{fig:finest}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{fig_grid_zoom.pdf}
+\caption{Grid refinement at the three waves.  Darker curves are finer grids.  The
+shock (c) stays about three cells wide at every resolution.  The contact (b) is
+wider in physical units and spans more cells as the grid is refined
+(\cref{tab:features}).  The coarse-grid temperature overshoot in (d) disappears by
+$N_x=12{,}500$.}
+\label{fig:gridzoom}
+\end{figure}
+
+\subsection{Grid convergence}
+\label{sec:conv_results}
+
+\Cref{tab:L1,tab:L2,tab:orders} and \cref{fig:convergence} give the errors and
+observed orders.  Because the solution outside the error window is exact to
+round-off, the wave-region $L_2$ errors (\cref{tab:waveL2}) are the global ones
+multiplied by $\approx\sqrt{L_x/0.7}=5.35$.  They therefore have identical orders.
+
+\begin{table}[ht]
+\centering
+\caption{Global $L_1$ errors (mean absolute error over all cells).}
+\label{tab:L1}
+\small
+\begin{tabular}{@{}rcccc@{}}
+\toprule
+$N_x$ & $\rho$ & $u$ & $p$ & $T$ \\
+\midrule
+\tabinput{data/tab_conv_L1.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Global $L_2$ (RMS) errors and temperature peak excess.}
+\label{tab:L2}
+\small
+\begin{tabular}{@{}rccccc@{}}
+\toprule
+$N_x$ & $\rho$ & $u$ & $p$ & $T$ & $T$ peak excess \\
+\midrule
+\tabinput{data/tab_conv_L2.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Wave-region $L_2$ errors, $x\in[x_0-0.3,\ x_0+0.4]$.}
+\label{tab:waveL2}
+\small
+\begin{tabular}{@{}rcccc@{}}
+\toprule
+$N_x$ & $\rho$ & $u$ & $p$ & $T$ \\
+\midrule
+\tabinput{data/tab_conv_waveL2.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Observed orders.  Columns 2--5: pairwise $L_2$ orders~\eqref{eq:order} between
+successive grids.  Then the least-squares $L_2$ order over all five grids, the
+least-squares $L_1$ order, and the least-squares wave-region $L_2$ order.}
+\label{tab:orders}
+\small
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+ & \multicolumn{4}{c}{pairwise $L_2$ order} & \multicolumn{3}{c}{least-squares fit} \\
+\cmidrule(lr){2-5}\cmidrule(l){6-8}
+ & $3125{\to}6250$ & $6250{\to}12.5$k & $12.5{\to}25$k & $25{\to}50$k & $L_2$ & $L_1$ & wave $L_2$ \\
+\midrule
+\tabinput{data/tab_conv_orders.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_convergence.pdf}
+\caption{Convergence of the global $L_1$ and $L_2$ errors, with the $L_2$ error also
+measured against the cell-averaged exact solution (right).  Dotted lines are
+reference slopes.}
+\label{fig:convergence}
+\end{figure}
+
+\paragraph{Interpretation.}  All four variables converge.  The least-squares $L_1$
+orders are $0.81$--$0.89$, between the contact value $\tfrac23$ and the shock value
+$1$ predicted in \cref{sec:expected_rates}.  For the variables that jump across the
+contact ($\rho$, $T$) and for $u$, the $L_2$ orders are $0.40$--$0.49$, between the
+contact value $\tfrac13$ and the shock value $\tfrac12$.  Pressure, which does not
+jump at the contact, converges at $0.63$, somewhat above $\tfrac12$, because its
+faster-converging rarefaction error still makes up a visible share of the total.  The ratio of the $L_2$ order to the $L_1$ order lies between $0.50$ and
+$0.72$, close to the value of one half predicted by~\eqref{eq:L1L2delta}.  Temperature, which carries the largest relative contact jump, converges
+slowest.  No pairwise order approaches two; the solution is not
+smooth, and formal second-order accuracy cannot be verified on this test.
+
+\subsection{Error by wave: which feature limits convergence}
+\label{sec:features}
+
+The global squared error is the sum of the contributions of the rarefaction, the
+contact and the shock.  \Cref{fig:features} separates them using the zones
+$[x_0-0.25,\,x_0+0.07]$, $[x_0+0.07,\,x_0+0.20]$ and $[x_0+0.20,\,x_0+0.40]$.
+For density, the least-squares orders of the three contributions are
+$\zoneSlopeAA$ (rarefaction), $\zoneSlopeAB$ (contact) and $\zoneSlopeAC$ (shock).
+For temperature they are $\zoneSlopeDA$, $\zoneSlopeDB$ and $\zoneSlopeDC$.
+The contact is the largest contributor on every grid and has the slowest
+convergence, close to the theoretical $\tfrac13$.  It therefore controls the global
+$\rho$ and $T$ errors, and its share grows under refinement.
+
+\Cref{tab:features} and \cref{fig:widths} measure this directly.  The shock
+thickness stays at $2.9$--$3.1$ cells (physical thickness order
+$\shockWidthSlope\approx1$).  This is the self-steepening behaviour of a captured
+shock.  The contact thickness scales as $\Delta x^{\contactWidthSlope}$, close to the
+$\Delta x^{2/3}$ law for a second-order scheme, so it spans more cells on finer
+grids: $4.3$ cells at $N_x=3125$ and $9.3$ cells at $N_x=50{,}000$.  The contact and
+shock position errors decrease steadily.  The shock runs about $0.2$ cells ahead of
+the exact position, and the contact lags by an amount that decreases faster than
+$\Delta x$.
+
+\begin{table}[ht]
+\centering
+\caption{Measured contact and shock thickness (maximum-gradient definition, from
+$\rho$) in physical units and in cells, and the position errors
+(numerical minus exact) of the mid-level crossings.}
+\label{tab:features}
+\small
+\begin{tabular}{@{}rcccccc@{}}
+\toprule
+$N_x$ & $\delta_c$ & $\delta_c/\Delta x$ & $\delta_s$ & $\delta_s/\Delta x$ & contact position error & shock position error \\
+\midrule
+\tabinput{data/tab_features.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_feature_errors.pdf}
+\caption{Contribution of each wave to the global $L_2$ error for (a) density and
+(b) temperature.  The dashed band in (a) is the finite-$\tau$ contact floor
+predicted by~\eqref{eq:erf_l2}.}
+\label{fig:features}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.62\textwidth]{fig_feature_widths.pdf}
+\caption{Measured contact and shock thickness versus grid spacing.  The shaded band
+is the kinetic contact thickness~\eqref{eq:dkin} predicted for
+$\tau = 5\times10^{-6}$.}
+\label{fig:widths}
+\end{figure}
+
+\subsection{The velocity error and the sub-cell position of the shock}
+\label{sec:phase}
+
+Velocity is the one variable whose $L_2$ error does not decrease monotonically:
+$L_2(u)$ rises slightly from $N_x=3125$ to $6250$ and is flat from $25{,}000$ to
+$50{,}000$ (\cref{tab:L2}).  This matches the ``velocity stops improving'' observation
+recorded in earlier studies.  The zone decomposition shows why.  Between $93\%$
+(coarsest grid) and $99\%$ (finest grid) of $L_2(u)^2$ comes from the $\pm4$ cells
+around the shock, where $u$ jumps by $u^*=0.93$.  The velocity is continuous across
+the contact, and the rarefaction contribution is four to ten times smaller than
+the shock contribution.
+
+The contribution from the handful of cells that straddle the shock depends on
+\emph{where the exact shock falls inside a cell}.  The metric compares cell values
+with the exact solution sampled at cell centres.  A shock near a face therefore
+produces one cell with an almost full-jump error, while a shock near a cell centre
+splits the error between two cells.  With the exact shock at
+$x_s = x_0 + 0.262823$, its fractional position within its cell is
+$0.57$, $0.13$, $0.26$, $0.53$ and $0.06$ on the five grids (\cref{tab:phase}).
+Grouping the grids by this phase removes the irregularity.  Between the two
+mid-cell grids ($N_x=3125$ and $25{,}000$) the shock-zone $L_2(u)$ converges with
+order $\shockPhaseSlopeA$.  Between the two near-face grids ($6250$ and $50{,}000$)
+the order is $\shockPhaseSlopeB$.  Both match the theoretical $\tfrac12$ for a captured
+shock (\cref{fig:phase}a).  The flat $25{,}000\to50{,}000$ velocity result is
+therefore a sampling artefact of comparing a point-sampled discontinuous reference
+with an $\ord(1)$-per-cell error.  It does not indicate a relaxation-time or
+time-step limit.
+
+Averaging the exact solution over each cell, which is the natural reference for a
+finite-volume method, reduces the coarse-grid velocity error.  It does not remove
+the phase dependence (\cref{fig:phase}b, \cref{tab:orders_avg}), because the discrete
+shock profile itself depends on the shock's sub-cell position.  Two practical
+consequences follow.  First, $L_1(u)$, which weights the few shock cells less
+heavily, converges monotonically with order $0.89$ and is the more robust velocity
+metric.  Second, velocity $L_2$ orders should be quoted from least-squares fits over
+several grids, preferably with refinement ratios that sample different shock phases,
+rather than from a single pair of grids.
+
+\begin{table}[ht]
+\centering
+\caption{Sub-cell position (phase) of the exact shock, the shock-zone ($\pm4\Delta x$)
+velocity error, and that error scaled by $\Delta x^{1/2}$, against point-sampled and
+cell-averaged exact solutions.  A phase-independent error would give a constant
+scaled value.}
+\label{tab:phase}
+\small
+\begin{tabular}{@{}rccccc@{}}
+\toprule
+ & & \multicolumn{2}{c}{point-sampled exact} & \multicolumn{2}{c}{cell-averaged exact} \\
+\cmidrule(lr){3-4}\cmidrule(l){5-6}
+$N_x$ & phase & shock-zone $L_2(u)$ & $/\Delta x^{1/2}$ & shock-zone $L_2(u)$ & $/\Delta x^{1/2}$ \\
+\midrule
+\tabinput{data/tab_shock_phase.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{Global $L_2$ errors against the cell-averaged exact solution, with pairwise
+and least-squares orders (the last column is the least-squares $L_1$ order).}
+\label{tab:orders_avg}
+\small
+\begin{tabular}{@{}rcccc@{}}
+\toprule
+$N_x$ & $\rho$ & $u$ & $p$ & $T$ \\
+\midrule
+\tabinput{data/tab_conv_L2avg.tex}
+\bottomrule
+\end{tabular}\\[6pt]
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & $3125{\to}6250$ & $6250{\to}12.5$k & $12.5{\to}25$k & $25{\to}50$k & $L_2$ fit & $L_1$ fit \\
+\midrule
+\tabinput{data/tab_conv_orders_avg.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_shock_phase.pdf}
+\caption{(a) Shock-zone velocity error.  Point labels give the sub-cell position of
+the exact shock.  Grids with matching phase converge at order $\approx\tfrac12$.
+(b) Global $L_2(u)$ against point-sampled and cell-averaged exact solutions.}
+\label{fig:phase}
+\end{figure}
+
+\subsection{The role of the finite relaxation time}
+\label{sec:tau_results}
+
+\Cref{sec:contact_diffusion} predicts that at fixed $\tau$ the contact cannot become
+thinner than $\delta_c^{\mathrm{kin}} = \kinContactMin$--$\kinContactMax$ for
+$\tau=5\times10^{-6}$.  The contact error therefore has a floor of
+$\rhoFloorMin$--$\rhoFloorMax$ in global $L_2(\rho)$.  The measured contact thickness
+on the finest grid is $3.7\times10^{-3}$, about three times the kinetic value
+(\cref{fig:widths}), and the contact-zone density error ($6.8\times10^{-4}$) is still
+above the floor (\cref{fig:features}a).  The present study is therefore
+discretization-dominated.  Extrapolating the measured $\Delta x^{0.73}$ contact
+thickness, the numerical and kinetic thicknesses become equal near
+$\Delta x\approx1\times10^{-4}$ ($N_x\approx2\times10^5$).  Below that spacing, further
+refinement at $\tau=5\times10^{-6}$ would stop reducing the $\rho$ and $T$ errors.
+
+For the earlier setting $\tau = 5\times10^{-5}$ the kinetic contact is
+$10^{1/2}\approx3.2$ times thicker ($3.7$--$4.6\times10^{-3}$).  That is already equal
+to the numerical contact thickness at $N_x = 50{,}000$.  This explains the plateau
+recorded in the project handoff for that setting (\cref{tab:tau_compare}):
+$L_2(\rho)$ was $1.130\times10^{-3}$ at $N_x=40{,}000$ and $1.132\times10^{-3}$ at
+$50{,}000$, whereas at $\tau=5\times10^{-6}$ the error keeps falling to
+$7.77\times10^{-4}$.  The earlier runs also used a ten times larger time step
+($\Delta t = 1.25\times10^{-5}$, CFL $=0.10$), so the comparison does not separate
+$\tau$ from $\Delta t$.  It is, however, quantitatively consistent with the
+finite-$\tau$ contact floor.
+
+\begin{table}[ht]
+\centering
+\caption{Global $L_2(\rho)$ at the two relaxation times.  The $\tau=5\times10^{-5}$ values
+are the September 13 results recorded in the project handoff (CFL $=0.10$,
+$\Delta t=1.25\times10^{-5}$).  The $N_x=50{,}000$ value at that $\tau$ comes from the
+separate follow-on run in the same record.}
+\label{tab:tau_compare}
+\small
+\begin{tabular}{@{}rccc@{}}
+\toprule
+$N_x$ & $\tau=5\times10^{-5}$ (handoff) & $\tau=5\times10^{-6}$ (this study) & ratio \\
+\midrule
+3,125  & $3.244\times10^{-3}$ & $3.163\times10^{-3}$ & $0.97$ \\
+6,250  & $1.961\times10^{-3}$ & $1.806\times10^{-3}$ & $0.92$ \\
+12,500 & $1.594\times10^{-3}$ & $1.392\times10^{-3}$ & $0.87$ \\
+25,000 & $1.258\times10^{-3}$ & $1.003\times10^{-3}$ & $0.80$ \\
+40,000 & $1.130\times10^{-3}$ & --- & --- \\
+50,000 & $1.132\times10^{-3}$ & $7.766\times10^{-4}$ & $0.69$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Limiter comparison}
+\label{sec:limiter_results}
+
+\Cref{tab:limiters} and \cref{fig:limiters} compare the five limiters developed
+during the project at $N_x=6250$, under identical physics, $\Delta t$, grid and final
+time.  The generalized-minmod case reproduces the convergence-study run at the same
+grid to all printed digits, which cross-checks the two independently written
+implementations.
+
+\begin{table}[ht]
+\centering
+\caption{Limiter comparison, $N_x=6250$, $\tau=5\times10^{-6}$, CFL $=0.025$.}
+\label{tab:limiters}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Limiter & $L_1(\rho)$ & $L_1(u)$ & $L_1(p)$ & $L_1(T)$ & wave $L_1(T)$ & $T$ peak excess \\
+\midrule
+\tabinput{data/tab_limiters.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_limiters.pdf}
+\caption{Limiter comparison at $N_x=6250$.  Minmod and the macroscopic hybrid nearly
+coincide.  MC is the sharpest and shows the largest temperature overshoot, just
+behind the contact (b).}
+\label{fig:limiters}
+\end{figure}
+
+The results reproduce, at the new $\tau$ and CFL, the tradeoff identified earlier in
+the project:
+\begin{itemize}
+  \item MC gives the smallest average errors but the largest temperature peak
+        excess ($6.7\times10^{-3}$).  Its compressive slopes, $\phi$ up to $2$,
+        overshoot at the contact, and the high-sensitivity populations of
+        \cref{tab:sensitivity} amplify the overshoot into $T$.
+  \item Minmod has the smallest overshoot ($4.5\times10^{-4}$) but the largest
+        average errors.
+  \item The macroscopic hybrid behaves almost exactly like minmod.  Its shared
+        troubled-cell mask evidently covers most of the cells in which minmod and MC
+        would differ, so it rarely uses the MC slope where it matters.
+  \item Generalized minmod with $\theta=1.2$ reduces all four global $L_1$ errors by
+        $20$--$23\%$ relative to minmod, and reduces MC's temperature peak excess by
+        $77\%$.
+\end{itemize}
+
+\subsection{The $\theta$ sweep}
+\label{sec:theta_results}
+
+\Cref{tab:theta,fig:theta} show the whole family from $\theta=1$ (identical to
+minmod) to $\theta=2$ (identical to MC).  The average error decreases monotonically
+with $\theta$, and the temperature peak excess increases monotonically.  The family
+therefore traces a single diffusion--overshoot tradeoff curve (\cref{fig:theta}b).
+No $\theta$ is best on both metrics.  Measured along that curve, $\theta=1.2$ captures
+$59\%$ of the $L_1(T)$ reduction available between minmod and MC while incurring
+$18\%$ of the overshoot increase.  For comparison, $\theta=1.1$ gives $35\%/7\%$ and
+$\theta=1.3$ gives $74\%/30\%$.  $\theta=1.2$ is thus a reasonable compromise, not an
+optimum.  The appropriate value depends on how peak temperature error is weighed
+against average error.  On the convergence grids the peak excess at $\theta=1.2$
+vanishes for $N_x\ge12{,}500$ (\cref{tab:L2}), so the overshoot cost is a
+coarse-grid effect at this $\tau$.  No fallback or retry occurred for any $\theta$.
+
+\begin{table}[ht]
+\centering
+\caption{$\theta$ sweep, $N_x=6250$, $\tau=5\times10^{-6}$, CFL $=0.025$.  The last column
+counts limiter fallbacks.}
+\label{tab:theta}
+\small
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+$\theta$ & $L_1(\rho)$ & $L_1(u)$ & $L_1(p)$ & $L_1(T)$ & wave $L_1(T)$ & $T$ peak excess & fb \\
+\midrule
+\tabinput{data/tab_theta.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_theta_sweep.pdf}
+\caption{(a) Global $L_1$ errors normalized by the minmod ($\theta=1$) values.
+(b) Temperature $L_1$ error versus temperature peak excess.  Each point is one
+$\theta$; the solver's $\theta=1.2$ is circled.}
+\label{fig:theta}
+\end{figure}

@@ -1,0 +1,17 @@
+Max moment residuals over 2000 random states [M0 M1 E M2 M3]: [1.55e-15 8.88e-16 7.11e-15 3.11e-15 7.11e-15]
+M4 check: sum(f c^4) = 11.571428571429, closed form = 11.571428571429
+alpha0 = -9.000000, alpha1 = 21.755102, alpha2 = 10.000000
+CE check (500 random states): max|mass flux| = 1.15e-09, rel err Pi = 2.01e-09, rel err q = 2.73e-09
+Eigenvalues of d(feq)/df at (rho,u,p)=(0.4,0.9,0.3): [-2.331e-10 -2.173e-10 1 1 1]
+Sod: p* = 0.303130, u* = 0.927453, rho*L = 0.426319, rho*R = 0.265574
+Sod: T*L = 0.711040, T*R = 1.141416, TL = 1, TR = 0.8
+Sod speeds: head = -1.183216, tail = -0.070273, contact = 0.927453, shock = 1.752156
+Sod positions at t=0.15 relative to x0: -0.177482, -0.010541, 0.139118, 0.262823
+Shock Mach number Ms = 1.655632
+Contact P(u*) = (v1^2-u*^2)(v2^2-u*^2) = 1.138206
+Left (1,0,1)           feq = [0.08163 -0.2347 1.306 -0.2347 0.08163] ; dT/df_i = [0.8 -0.8 -0.3875 -0.8 0.8]
+Right (0.125,0,0.1)    feq = [0.006601 -0.009407 0.1306 -0.009407 0.006601] ; dT/df_i = [8 -4.8 -1.5 -4.8 8]
+Star-left              feq = [0.0001176 -0.1029 0.3959 0.05338 0.07981] ; dT/df_i = [5.568 0.075 0.1724 -1.665 0.3473]
+Star-right             feq = [0.001088 -0.1089 0.3959 -0.1042 0.08165] ; dT/df_i = [7.318 -1.5 -1.344 -4.294 -1.063]
+Slow populations negative when T > (v2^2-u^2)/((b-1)v2^2/eta0^2+1); at u=0: T > 0.7056
+Fast populations negative when T < (v1^2-u^2)/((b-1)v1^2/eta0^2+1); at u=0: T < 0.4336

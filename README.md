@@ -94,8 +94,11 @@ cd matlab/d1v5
 d1v5_sodshock_gminmod_rk3
 ```
 
-The saved setup uses `Nx = 50000`, `Lx = 20`, `tau = 5e-5`, `CFL = 0.10`,
-`tEnd = 0.15`, and `theta = 1.20`. To do a faster test without editing the
+The saved setup uses `Nx = 50000`, `Lx = 20`, `tau = 5e-6`, `CFL = 0.025`,
+`tEnd = 0.15`, and `theta = 1.20`. (The figures and tables further down this
+page were produced earlier with `tau = 5e-5` and `CFL = 0.10`; the current
+configuration is analysed in the
+[mathematics report](reports/d1v5_mathematics/d1v5_solver_mathematics.pdf).) To do a faster test without editing the
 file, I can temporarily override the grid:
 
 ```matlab
@@ -185,6 +188,7 @@ tube.
 | [`matlab/archive/`](matlab/archive/) | Earlier limiter implementations retained to document decisions |
 | [`results/`](results/) | Versioned figures and machine-readable numerical results |
 | [`reports/`](reports/) | Detailed limiter-development explanations |
+| [`reports/d1v5_mathematics/`](reports/d1v5_mathematics/) | LaTeX report on the mathematics and physics of the solver, with the `tau = 5e-6` convergence study, limiter comparison, and `theta` sweep |
 | [`LIMITERS.md`](LIMITERS.md) | How each limiter detects risky gradients, switches behavior, and can fail |
 | [`SOURCES.md`](SOURCES.md) | Papers and books used for model and numerical-method decisions |
 | [`METHODOLOGY.md`](METHODOLOGY.md) | Chronological explanation of what was attempted and why |

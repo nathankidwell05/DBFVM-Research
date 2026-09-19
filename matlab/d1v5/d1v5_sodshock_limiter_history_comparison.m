@@ -10,6 +10,13 @@
 %   3. Population hybrid: each f_i independently chose MC or minmod.
 %   4. Macroscopic hybrid: all f_i shared one troubled-cell decision.
 %   5. Generalized minmod: one continuous theta value between minmod and MC.
+%
+% Revision notes (September 18, 2026):
+%   * tau and CFL now match the live solver: tau = 5e-6, CFL = 0.025.
+%   * Default Nx is 6250, the resolution of the documented comparison.
+%   * L2 errors were added next to the L1 errors.
+%   * Results and figures are saved to results/ with the settings in the
+%     filename so runs with different settings do not overwrite each other.
 
 clear;                                              % remove old variables
 clc;                                                % clear the Command Window
@@ -18,12 +25,12 @@ close all;                                          % close old figures
 %% Physical and Numerical Parameters
 gamma = 1.4;                                        % specific-heat ratio for an air-like gas
 b = 2/(gamma-1);                                    % internal degrees-of-freedom parameter; gamma=1.4 gives b=5
-tau = 5.0e-5;                                       % BGK relaxation time
-CFL = 0.10;                                         % transport stability factor
+tau = 5.0e-6;                                       % BGK relaxation time (matches the live solver)
+CFL = 0.025;                                        % transport stability factor (matches the live solver)
 tEnd = 0.15;                                        % final comparison time
 thetaFinal = 1.20;                                  % final generalized-minmod setting
 
-Nx = 50000;                                         % production resolution; use 10000 for a faster comparison
+Nx = 6250;                                          % documented comparison resolution; DBM_NX can override it
 nxText = getenv('DBM_NX');                          % optional resolution override for a documented comparison run
 if ~isempty(nxText); Nx = str2double(nxText); end   % keep the published default unless DBM_NX is supplied
 Lx = 20.0;                                          % long domain keeps waves away from the boundaries
@@ -88,6 +95,10 @@ waveL1u = zeros(numberOfCases,1);                    % velocity error only aroun
 waveL1p = zeros(numberOfCases,1);                    % pressure error only around the waves
 waveL1T = zeros(numberOfCases,1);                    % temperature error only around the waves
 temperaturePeakExcess = zeros(numberOfCases,1);      % numerical maximum T minus exact maximum T
+globalL2rho = zeros(numberOfCases,1);                % whole-domain RMS density error
+globalL2u = zeros(numberOfCases,1);                  % whole-domain RMS velocity error
+globalL2p = zeros(numberOfCases,1);                  % whole-domain RMS pressure error
+globalL2T = zeros(numberOfCases,1);                  % whole-domain RMS temperature error
 
 exactTemperaturePeak = max(exact.T(waveMask));       % exact temperature peak in the comparison region
 
@@ -102,12 +113,19 @@ for caseNumber = 1:numberOfCases                     % calculate identical metri
     waveL1p(caseNumber) = mean(abs(results(caseNumber).p(waveMask)-exact.p(waveMask)));
     waveL1T(caseNumber) = mean(abs(results(caseNumber).T(waveMask)-exact.T(waveMask)));
     temperaturePeakExcess(caseNumber) = max(results(caseNumber).T(waveMask))-exactTemperaturePeak;
+
+    globalL2rho(caseNumber) = sqrt(mean((results(caseNumber).rho-exact.rho).^2));
+    globalL2u(caseNumber) = sqrt(mean((results(caseNumber).u-exact.u).^2));
+    globalL2p(caseNumber) = sqrt(mean((results(caseNumber).p-exact.p).^2));
+    globalL2T(caseNumber) = sqrt(mean((results(caseNumber).T-exact.T).^2));
 end
 
 errorTable = table(string(limiterLabels(:)),globalL1rho,globalL1u,globalL1p,globalL1T, ...
     waveL1rho,waveL1u,waveL1p,waveL1T,temperaturePeakExcess, ...
+    globalL2rho,globalL2u,globalL2p,globalL2T, ...
     'VariableNames',{'Limiter','GlobalL1_rho','GlobalL1_u','GlobalL1_p','GlobalL1_T', ...
-    'WaveL1_rho','WaveL1_u','WaveL1_p','WaveL1_T','T_peak_excess'}); % collect comparison metrics
+    'WaveL1_rho','WaveL1_u','WaveL1_p','WaveL1_T','T_peak_excess', ...
+    'GlobalL2_rho','GlobalL2_u','GlobalL2_p','GlobalL2_T'}); % collect comparison metrics
 
 fprintf('\nLimiter error comparison\n');
 disp(errorTable);                                     % print all errors in one readable table
@@ -181,7 +199,18 @@ box on;
 set(gca,'FontSize',15,'LineWidth',1.2);                         % enlarge axes and tick labels
 
 %% Save Comparison Data
-outputFile = fullfile(fileparts(mfilename('fullpath')),'d1v5_limiter_history_results.mat');
+resultsFolder = fullfile(fileparts(mfilename('fullpath')),'results'); % shared results folder
+if ~isfolder(resultsFolder); mkdir(resultsFolder); end
+settingsTag = sprintf('Nx%d_tau%s_CFL%s',Nx,strrep(sprintf('%.0e',tau),'+',''), ...
+    strrep(sprintf('%.3f',CFL),'.','p'));               % e.g. Nx6250_tau5e-06_CFL0p025
+outputFile = fullfile(resultsFolder,['d1v5_limiter_history_' settingsTag '_results.mat']);
+writetable(errorTable,fullfile(resultsFolder,['d1v5_limiter_history_' settingsTag '_metrics.csv']));
+figureHandles = findobj('Type','figure');           % both comparison figures
+for figureNumber = 1:numel(figureHandles)
+    exportgraphics(figureHandles(figureNumber),fullfile(resultsFolder, ...
+        sprintf('d1v5_limiter_history_%s_fig%d.png',settingsTag,figureHandles(figureNumber).Number)), ...
+        'Resolution',150);                          % save a picture of every comparison figure
+end
 save(outputFile,'x','x0','results','exact','errorTable','waveMask','Nx','Lx','dx', ...
     'tau','CFL','tEnd','thetaFinal','dtBase');                   % save everything needed for later plots
 fprintf('Comparison data saved to:\n%s\n',outputFile);
