@@ -1,0 +1,155 @@
+% ---------------------------------------------------------------------------
+% Comparison with other methods (accuracy and computational cost).
+% Table rows in data/tab_methods.tex are written by make_guide_figures.m.
+% ---------------------------------------------------------------------------
+\subsection{Comparison with other methods: accuracy and computational cost}
+\label{sec:comparison}
+
+To place the solver in context, the same Sod problem was solved on the same grids with
+five alternative methods:
+\begin{itemize}
+  \item the \textbf{same DBM} with three other reconstructions: first-order upwind (no
+        slope), MUSCL with minmod, and MUSCL with MC; and
+  \item a \textbf{conventional finite-volume Euler solver}, which evolves density,
+        momentum and energy directly, using the HLLC approximate Riemann
+        solver~\citep{ToroSpruceSpeares1994,Toro2009} with either first-order reconstruction
+        or the same generalized-minmod MUSCL reconstruction ($\theta = 1.2$) and SSP-RK3
+        time stepping at a standard CFL number of 0.5.
+\end{itemize}
+All computations used the same computer, one processor core and MATLAB R2024b.  The Euler
+times are the best of three measured runs.  The DBM times are the measured cost per cell per
+time step ($4.05\times10^{-7}$\,s for MUSCL and $2.74\times10^{-7}$\,s for first order,
+obtained from isolated runs on the two coarsest grids) multiplied by the number of cells and
+time steps; this cost was verified to be the same on both grids to within 0.4\%.
+
+\begin{table}[H]
+\centering
+\caption{Accuracy and cost of the six methods.  Orders are least-squares fits over the grids
+3{,}125--25{,}000 (common to all methods); errors and cost are for 25{,}000 cells.}
+\label{tab:methods}
+\small
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Observed order ($\rho$)} & \multicolumn{2}{c}{Error at 25{,}000 cells} & \multicolumn{2}{c}{Cost at 25{,}000 cells} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(l){6-7}
+Method & $L_1$ & $L_2$ & $L_1(\rho)$ & $L_2(\rho)$ & time steps & time [s] \\
+\midrule
+\tabinput{data/tab_methods.tex}
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{G09_order_comparison.pdf}
+\caption{Density error versus cell size for the six methods: $L_1$ (a) and $L_2$ (b).}
+\label{fig:ordercomp}
+\end{figure}
+
+\begin{figexplain}{\Cref{fig:ordercomp}}
+\begin{fx}
+\item[What is shown.] The density error of every method on every grid.  Blue curves are
+  DBM variants (the dark solid curve is the solver studied here); red and orange curves are
+  the conventional Euler solver.  Hollow markers denote first-order methods.
+\item[How to read it.] Lower curves are more accurate at a given grid; steeper curves improve
+  faster with refinement.  The dotted lines give reference slopes of 1 and $1/2$.
+\item[What it means.] The methods separate into two groups.  The two first-order methods
+  (hollow markers) have errors three to seven times larger, with the gap widening under
+  refinement, and converge more slowly ($L_1$ order 0.64).  All second-order methods cluster together with $L_1$ orders of
+  0.80--0.92, whether they are kinetic (DBM) or conventional (Euler).  At equal resolution
+  the density error of the present DBM is about one third larger than that of the
+  conventional MUSCL-HLLC solver.  The order of accuracy is therefore determined by the
+  reconstruction, not by whether the gas is modelled kinetically or with the Euler equations.
+\end{fx}
+\end{figexplain}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{G10_accuracy_vs_cost.pdf}
+\caption{(a) Density error versus computing time for the six methods.  (b) Number of time
+steps required by the DBM and the Euler solver on each grid.}
+\label{fig:cost}
+\end{figure}
+
+\begin{figexplain}{\Cref{fig:cost}}
+\begin{fx}
+\item[What is shown.] Panel (a) is a work--precision diagram: each point is one grid, placed by
+  its computing time (horizontal) and its density error (vertical).  Panel (b) shows how many
+  time steps each solver needed on each grid.
+\item[How to read it.] In (a), the most efficient method is the one whose curve lies furthest to
+  the lower left, meaning the lowest error for a given time.  A horizontal line through the
+  plot compares the time each method needs to reach the same error.
+\item[What it means.] The conventional Euler solvers are two to three orders of magnitude
+  faster than the DBM for the same accuracy.  Panel (b) explains why.  The cost per cell per
+  time step is similar for both solvers ($4.1\times10^{-7}$\,s for the DBM versus about
+  $2.9\times10^{-7}$\,s for MUSCL-HLLC), but the DBM needs 120{,}001 steps on every grid
+  because its time step is fixed by the collision limit $\Delta t = \tau/4$, whereas the Euler
+  solver's step is set by the wave speed and needs only 102 steps on the coarsest grid and
+  1{,}643 on the finest.  The gap therefore narrows with refinement, from about 780 times at
+  6{,}250 cells to about 100 times at 50{,}000 cells.
+\end{fx}
+\end{figexplain}
+
+\paragraph{Quantitative summary.}
+\begin{itemize}
+  \item \textbf{Second-order versus first-order DBM.}  At the same grid, MUSCL with
+        $\theta = 1.2$ reduces the density error by a factor of 5.4 for only 1.5 times the
+        cost per step.  Reaching the same accuracy with first-order upwinding would require
+        roughly 14 times as many cells and about 9 times the computing time.
+  \item \textbf{Choice of limiter.}  MC is about 15\% more accurate on average than
+        $\theta = 1.2$ at identical cost, but produces the temperature overshoot described in
+        \cref{sec:limiters}; minmod has about 35\% larger error.
+  \item \textbf{DBM versus conventional Euler solver.}  On 50{,}000 cells the DBM reaches
+        $L_1(\rho) = 2.5\times10^{-5}$ in an estimated 2{,}430\,s.  The MUSCL-HLLC solver reaches the
+        same error on about 32{,}000 cells in roughly 10\,s, about 250 times less.  At equal
+        resolution its density error is 25\% smaller (at 25{,}000 cells).
+  \item \textbf{Source of the cost.}  The difference is entirely due to the number of time
+        steps.  If the DBM time step were set by the transport CFL condition (CFL $= 0.5$)
+        instead of by $\tau/4$, it would need about 2{,}250 steps on 50{,}000 cells instead of
+        120{,}001, a reduction by a factor of about 50.  This requires treating the collision
+        term implicitly~\citep{PareschiRusso2005} or using a scheme that couples transport and
+        collision~\citep{Guo2013}.
+\end{itemize}
+
+\paragraph{Context from the literature.}
+\Cref{tab:literature} places these results alongside other widely used shock-capturing
+approaches.  An important reference point is the study of Greenough and
+Rider~\citep{Greenough2004}, who compared a fifth-order WENO scheme~\citep{JiangShu1996}
+with a second-order piecewise-linear Godunov (MUSCL-type) scheme.  For problems with
+discontinuities, including the Sod problem, both schemes converged at approximately first
+order; on Sod the second-order scheme had about half the error of WENO and was about six
+times cheaper at equal resolution.  Comparative studies of many schemes on standard Euler
+test problems~\citep{LiskaWendroff2003} similarly show that no method avoids the
+accuracy limit imposed by discontinuities.  A second-order limited reconstruction is
+therefore a sound choice for shock-dominated flows, and the present DBM uses one.  Its
+efficiency disadvantage arises from the explicit treatment of collisions, not from the
+spatial scheme.
+
+\begin{table}[H]
+\centering
+\caption{Qualitative comparison of shock-capturing approaches for problems such as Sod.}
+\label{tab:literature}
+\small
+\begin{tabularx}{\textwidth}{@{}p{3.3cm}cX@{}}
+\toprule
+Method & Formal order & Accuracy and cost on shock problems \\
+\midrule
+First-order upwind / Godunov & 1 & Robust but strongly diffusive; errors 3--7 times larger than
+  second-order methods at equal resolution (\cref{tab:methods}). \\
+MUSCL / TVD with limiter~\citep{vanLeer1979,Sweby1984} & 2 & Standard choice; convergence limited
+  by discontinuities to about first order in $L_1$; cheapest route to a given accuracy on
+  shock problems~\citep{Greenough2004}. \\
+WENO5~\citep{JiangShu1996} & 5 & Far more accurate for smooth flow; on Sod, about first-order
+  convergence with larger error and about six times higher cost than a second-order Godunov
+  scheme at equal resolution~\citep{Greenough2004}. \\
+Conventional Euler MUSCL-HLLC (this study) & 2 & $L_1(\rho)$ order 0.92; about 250 times cheaper
+  than the DBM for equal accuracy on this problem. \\
+FVDBM, explicit collision (this study) & 2 & Accuracy close to the conventional second-order
+  solver; time step limited to $\tau/4$, giving 120{,}001 steps on every grid.  Provides kinetic
+  information not available from the Euler equations. \\
+Kinetic schemes with implicit or coupled collision~\citep{PareschiRusso2005,Guo2013} & 2 &
+  Remove the $\Delta t \propto \tau$ restriction; the expected route to making the DBM
+  competitive in cost. \\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,5 +1,21 @@
 # Project snapshot history
 
+## 2026-09-18
+
+- Added `reports/d1v5_mathematics/`: a LaTeX report (with PDF) deriving the
+  KT-D1V5 equilibrium, a Chapman–Enskog analysis of the discrete model
+  (including the contact diffusivity `D_c = tau (v1^2-U^2)(v2^2-U^2)/((b+2)T)`),
+  the exact Sod solution, MUSCL/generalized-minmod TVD theory, SSP-RK3
+  stability, and the error norms, plus the scripts that verify each result and
+  build every figure and table.
+- Changed the solver defaults to `tau = 5e-6`, `CFL = 0.025`, and added the
+  `DBM_CFL` and `DBM_DISABLE_LIVE_PLOT` overrides.
+- Added the convergence driver (`Nx = 3125, 6250, 12500, 25000, 50000`) with
+  per-grid caching, L1 errors, effective-CFL records, settings-stamped output
+  files, and `onCleanup` removal of the `DBM_*` overrides.
+- Set the limiter-history comparison to `tau = 5e-6`, `CFL = 0.025`,
+  `Nx = 6250`, added L2 errors, and gave its outputs settings-stamped names.
+
 ## 2026-09-08
 
 - Added a limiter and stability guide covering first-order upwind, minmod, MC,

@@ -1,0 +1,71 @@
+\subsection{How the solver works, in one paragraph}
+The solver replaces the Euler equations with five linear advection equations, one
+per discrete velocity $c_i\in\{0,\pm1,\pm3\}$, coupled only through a local BGK
+relaxation toward the KT-D1V5 equilibrium.  That equilibrium is the unique
+five-population state whose moments reproduce the density, momentum and energy and
+the two Euler fluxes (\cref{prop:feq}).  Mass, momentum and energy are carried
+exactly by the collision operator and conservatively by the finite-volume
+transport.  Each population is upwinded exactly, since upwinding is the Riemann
+solution for linear advection.  Accuracy comes from a MUSCL reconstruction whose
+slope is limited by the generalized minmod, which is TVD for each population's
+transport when $1\le\theta\le2$ (\cref{prop:tvd}).  SSP-RK3 advances everything with a
+time step set by the relaxation time, $\Delta t=\tau/4$.  This step resolves the
+BGK decay (stiffness exactly $1/\tau$) and keeps the transport Courant number below
+$0.01$ on every grid.
+
+\subsection{Principal findings}
+\begin{enumerate}
+  \item \textbf{Model.}  The KT-D1V5 model reproduces the Euler equations exactly at
+        leading order.  Its $\ord(\tau)$ terms are not Navier--Stokes: the viscosity is
+        about $3.5$ times the BGK value, the dissipation is not Galilean invariant,
+        and there is a spurious density-gradient energy flux (\cref{tab:ce_compare}).
+        $\tau$ should be regarded as a regularization that vanishes in the Euler limit.
+  \item \textbf{Contact physics of the model.}  A contact moving at speed $U$ diffuses
+        with $D_c=\tau(v_1^2-U^2)(v_2^2-U^2)/[(b+2)T]$.  At the Sod contact this is
+        eight times weaker than at rest, and it would become anti-diffusive for
+        $|U|>v_1$.  At the level of this first-order analysis, the result limits the flow speeds
+        for which the present velocity set is usable.
+  \item \textbf{Temperature sensitivity.}  $\partial T/\partial f_i = [(c_i-u)^2+\eta_i^2-bT]/(b\rho)$
+        reaches about $7$ for the fast counter-moving population in the post-shock
+        state.  This explains why limiter-induced overshoot appears first, and most
+        strongly, in $T$.
+  \item \textbf{Convergence.}  With $\tau=5\times10^{-6}$ and $\mathrm{CFL}=0.025$ on five
+        grids up to $N_x=50{,}000$, all runs were clean (no retries, fallbacks or
+        repairs) and conservative to round-off.  The fitted orders are
+        $L_1\approx0.81$--$0.89$ and $L_2\approx0.40$--$0.63$, which is the correct
+        behaviour for a second-order method on a solution with a shock and a
+        contact.  The contact is the slowest-converging feature
+        (thickness $\propto\Delta x^{0.73}$, close to the theoretical $\Delta x^{2/3}$).
+        The shock stays three cells wide.
+  \item \textbf{Velocity anomaly explained.}  The non-monotone $L_2(u)$ comes from the
+        sub-cell position of the exact shock relative to the grid.  Grids with
+        matching phase converge at order $0.50$--$0.51$.  $L_1(u)$ converges
+        monotonically.
+  \item \textbf{Relaxation time.}  At $\tau=5\times10^{-6}$ the grids used here remain
+        discretization-dominated.  The kinetic contact floor is predicted to matter
+        only near $N_x\approx2\times10^5$.  At $\tau=5\times10^{-5}$ the floor is reached
+        near $N_x\approx5\times10^4$, consistent with the plateau seen in the earlier
+        study.
+  \item \textbf{Limiter.}  $\theta=1.2$ lowers every global $L_1$ error by $20$--$23\%$
+        relative to minmod and cuts MC's temperature overshoot by $77\%$.  The
+        $\theta$ sweep shows a single monotone tradeoff: $\theta=1.2$ buys $59\%$ of the
+        attainable $L_1(T)$ improvement for $18\%$ of the overshoot cost.  It is a
+        defensible compromise, not a unique optimum.
+\end{enumerate}
+
+\subsection{Limitations and recommended next steps}
+\begin{itemize}
+  \item Every convergence run used the same $\Delta t$, so temporal error was not
+        measured.  A short $\Delta t$-halving test at $N_x=50{,}000$ would confirm the
+        expectation that it is negligible.
+  \item Formal second-order accuracy should be verified on a smooth problem (for
+        example an isentropic or small-amplitude acoustic pulse), because Sod
+        cannot show it.
+  \item The finite-$\tau$ floor analysis is a first-order Chapman--Enskog estimate.
+        A $\tau$ study at fixed $\Delta t$ and a fine grid would test it directly.
+  \item Velocity convergence should be reported from $L_1$ norms or from phase-varied
+        grid sequences, to avoid the shock-phase artefact.
+  \item The contact-diffusion result implies that a two-dimensional extension needs
+        a velocity set whose slowest speed exceeds the expected flow speeds, or a
+        higher-order (Navier--Stokes-level) equilibrium~\citep{KataokaTsutahara2004NS,Gan2018}.
+\end{itemize}
