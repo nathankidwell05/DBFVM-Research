@@ -1,19 +1,23 @@
 function [solverFolder,solverFile] = project_paths
-%PROJECT_PATHS finds the solver folder for either folder layout.
-%   OneDrive research folder:  <root>/report_d1v5_math/scripts  and  <root>/d1v5_sodshock_muscl_MC_RK3.m
-%   GitHub repository:         <repo>/reports/d1v5_mathematics/scripts  and  <repo>/matlab/d1v5/d1v5_sodshock_gminmod_rk3.m
-% Results are read from and written to <solverFolder>/results in both layouts.
+%PROJECT_PATHS finds the solver folder from a report scripts folder.
+%   The OneDrive research folder and the GitHub repository now share one
+%   layout, so a single rule locates the solver in both:
+%       <root>/matlab/d1v5/<solver file>
+%       <root>/reports/<report name>/scripts/   (this file)
+%   Only the solver file name differs between them: the OneDrive copy is
+%   d1v5_sodshock_muscl_MC_RK3.m and the repository copy is
+%   d1v5_sodshock_gminmod_rk3.m. Both names are tried below.
+%   Results are read from and written to <solverFolder>/results in both.
 
     here = fileparts(mfilename('fullpath'));
-    oneDriveRoot = fileparts(fileparts(here));
-    repoSolverFolder = fullfile(fileparts(fileparts(fileparts(here))),'matlab','d1v5');
-    if isfile(fullfile(oneDriveRoot,'d1v5_sodshock_muscl_MC_RK3.m'))
-        solverFolder = oneDriveRoot;
-        solverFile = fullfile(oneDriveRoot,'d1v5_sodshock_muscl_MC_RK3.m');
-    elseif isfile(fullfile(repoSolverFolder,'d1v5_sodshock_gminmod_rk3.m'))
-        solverFolder = repoSolverFolder;
-        solverFile = fullfile(repoSolverFolder,'d1v5_sodshock_gminmod_rk3.m');
-    else
-        error('Could not locate the KT-D1V5 solver from %s',here);
+    projectRoot = fileparts(fileparts(fileparts(here))); % up out of reports/<name>/scripts
+    solverFolder = fullfile(projectRoot,'matlab','d1v5');
+
+    candidateNames = {'d1v5_sodshock_muscl_MC_RK3.m', ... % OneDrive research folder
+                      'd1v5_sodshock_gminmod_rk3.m'};     % GitHub repository
+    for nameIndex = 1:numel(candidateNames)
+        solverFile = fullfile(solverFolder,candidateNames{nameIndex});
+        if isfile(solverFile); return; end
     end
+    error('Could not locate the KT-D1V5 solver in: %s',solverFolder);
 end
