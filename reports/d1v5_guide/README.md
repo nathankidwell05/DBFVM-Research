@@ -27,5 +27,18 @@ run_cost_benchmark                          % Euler solver runs and clean DBM ti
 make_guide_figures                          % all figures and data/tab_methods.tex
 ```
 
+To report the observed order of accuracy from the cached convergence runs:
+
+```matlab
+d1v5_order_estimate                      % density, generalized minmod, all cached grids
+d1v5_order_estimate('Variable','all')    % every variable
+d1v5_order_estimate('Limiter','firstorder')
+out = d1v5_order_estimate('Plot',true);  % also returns the numbers and plots the fit
+```
+
+It prints the L1 and L2 errors, the order between each pair of grids, the
+least-squares order over all grids, and a verdict on whether the result matches
+first-order or second-order behaviour on this problem.
+
 The generalized-minmod DBM runs come from `matlab/d1v5/run_d1v5_gminmod_L2_convergence.m`.
 `euler_sod_solver.m` is the conventional Euler solver used for comparison.
