@@ -57,7 +57,7 @@ function convergenceTable = run_d1v5_gminmod_L2_convergence(onlyNx)
     runFolder = fullfile(resultsFolder,'runs');        % one cached MAT file per finished grid
     if ~isfolder(runFolder); mkdir(runFolder); end
 
-    cleanupEnvironment = onCleanup(@clear_dbm_environment); %#ok<NASGU> % always restore standalone behavior
+    cleanupEnvironment = onCleanup(@clear_dbm_environment); % always restore standalone behavior
 
     %% Optional Single-Grid Mode
     if ~isempty(onlyNx)                                % run only one requested grid and stop
@@ -158,36 +158,45 @@ function convergenceTable = run_d1v5_gminmod_L2_convergence(onlyNx)
     disp(convergenceTable);
 
     %% Log-Log Convergence Plot
+    % Both panels carry reference slopes of 1 and 1/2, the fitted order of each
+    % variable in its legend entry, and a note on the velocity curve, so the
+    % figure can be read on its own without the Command Window output.
     convergenceFigure = figure('Name','KT-D1V5 Generalized-Minmod L2 Convergence', ...
         'Color','w','Position',[80 80 1500 900]);       % large readable figure
     layout = tiledlayout(1,2,'TileSpacing','compact','Padding','compact');
 
-    nexttile;
-    loglog(dxValues,L2rho,'o-','LineWidth',2.2,'MarkerSize',8); hold on;
-    loglog(dxValues,L2u,'s-','LineWidth',2.2,'MarkerSize',8);
-    loglog(dxValues,L2p,'d-','LineWidth',2.2,'MarkerSize',8);
-    loglog(dxValues,L2T,'^-','LineWidth',2.2,'MarkerSize',8);
-    set(gca,'XDir','reverse','FontSize',14,'LineWidth',1.1); % refinement moves left to right
-    xlabel('Grid spacing, \Deltax (log scale)','FontSize',16,'FontWeight','bold');
-    ylabel('Global L2 error (log scale)','FontSize',16,'FontWeight','bold');
-    title('Whole Domain','FontSize',18,'FontWeight','bold');
-    legend('\rho','u','p','T','Location','best','FontSize',13);
-    grid on; box on;
+    globalErrors = [L2rho, L2u, L2p, L2T];             % one column per variable
+    waveErrors = [waveL2rho, waveL2u, waveL2p, waveL2T];
 
-    nexttile;
-    loglog(dxValues,waveL2rho,'o-','LineWidth',2.2,'MarkerSize',8); hold on;
-    loglog(dxValues,waveL2u,'s-','LineWidth',2.2,'MarkerSize',8);
-    loglog(dxValues,waveL2p,'d-','LineWidth',2.2,'MarkerSize',8);
-    loglog(dxValues,waveL2T,'^-','LineWidth',2.2,'MarkerSize',8);
-    set(gca,'XDir','reverse','FontSize',14,'LineWidth',1.1);
-    xlabel('Grid spacing, \Deltax (log scale)','FontSize',16,'FontWeight','bold');
-    ylabel('Wave-region L2 error (log scale)','FontSize',16,'FontWeight','bold');
-    title('Rarefaction, Contact, and Shock Region','FontSize',18,'FontWeight','bold');
-    legend('\rho','u','p','T','Location','best','FontSize',13);
-    grid on; box on;
+    globalAxes = nexttile;
+    draw_convergence_panel(dxValues,globalErrors, ...
+        'Global L2 error (log scale)','Whole Domain');
+
+    waveAxes = nexttile;
+    draw_convergence_panel(dxValues,waveErrors, ...
+        'Wave-region L2 error (log scale)','Rarefaction, Contact, and Shock Region');
+
+    % The velocity curve flattens on the finest grids because almost all of the
+    % velocity error sits in the few cells at the shock, where the error depends
+    % on where the shock falls inside a cell. Label it so it does not read as a
+    % solver defect.
+    annotate_velocity_stall(globalAxes,dxValues,L2u);
+    annotate_velocity_stall(waveAxes,dxValues,waveL2u);
+
+    % One vertical scale across both panels, so the wave-region errors can be
+    % compared directly against the global ones instead of only by shape.
+    linkaxes([globalAxes waveAxes],'y');
+    allErrors = [globalErrors(:); waveErrors(:)];
+    ylim(globalAxes,[0.35*min(allErrors) 1.6*max(allErrors)]);
+    nice_log_ticks(globalAxes);
+    nice_log_ticks(waveAxes);
 
     title(layout,sprintf('KT-D1V5 FVDBM L2 Convergence: Generalized Minmod, \\theta=%.2f, \\tau=%.1e, CFL=%.3f', ...
         thetaValue,tauValue,cflValue),'FontSize',20,'FontWeight','bold');
+    subtitle(layout,sprintf('Grids %s cells;  fitted order shown beside each variable', ...
+        strjoin(string(NxValues(:)'),', ')),'FontSize',14);
+
+    datacursormode(convergenceFigure,'off');           % no stray data tips on the saved image
 
     %% Save Table and Plot
     % Settings are part of every filename so studies with different settings
@@ -327,4 +336,74 @@ function slope = loglog_slope(dxValues,errorValues)
 
     coefficients = polyfit(log(dxValues),log(errorValues),1); % natural-log fit
     slope = coefficients(1);                          % slope equals overall order p
+end
+
+function draw_convergence_panel(dxValues,errorMatrix,yLabelText,panelTitle)
+%DRAW_CONVERGENCE_PANEL plots the four variables against dx on one tile.
+% Each legend entry carries the least-squares order for that variable, and a
+% short reference fan at the fine end shows what slopes 1 and 1/2 look like.
+
+    variableNames = {'\rho','u','p','T'};
+    markerStyles = {'o-','s-','d-','^-'};
+
+    curveHandles = gobjects(1,4);
+    legendLabels = cell(1,4);
+    for variableIndex = 1:4
+        curveHandles(variableIndex) = loglog(dxValues,errorMatrix(:,variableIndex), ...
+            markerStyles{variableIndex},'LineWidth',2.2,'MarkerSize',8, ...
+            'MarkerFaceColor','w');
+        hold on;
+        legendLabels{variableIndex} = sprintf('%s  (order %.2f)', ...
+            variableNames{variableIndex}, ...
+            loglog_slope(dxValues,errorMatrix(:,variableIndex)));
+    end
+
+    % Reference slopes drawn as a short fan below the data at the fine end.
+    % A full-width reference line would cross the data and hide it.
+    referenceDx = [min(dxValues) 4*min(dxValues)];     % spans the two finest refinements
+    anchorValue = 0.55*min(errorMatrix(:));            % clear of the lowest curve
+    slopeOneHandle = loglog(referenceDx, ...
+        anchorValue*(referenceDx/referenceDx(1)).^1,'k:','LineWidth',1.8);
+    slopeHalfHandle = loglog(referenceDx, ...
+        anchorValue*(referenceDx/referenceDx(1)).^0.5,'k-.','LineWidth',1.8);
+
+    set(gca,'XDir','reverse','FontSize',14,'LineWidth',1.1); % refinement moves left to right
+    xlabel({'Grid spacing, \Deltax (log scale)', ...
+        '\leftarrow coarser                    finer \rightarrow'}, ...
+        'FontSize',16,'FontWeight','bold');
+    ylabel(yLabelText,'FontSize',16,'FontWeight','bold');
+    title(panelTitle,'FontSize',18,'FontWeight','bold');
+    legend([curveHandles slopeOneHandle slopeHalfHandle], ...
+        [legendLabels, {'reference slope 1','reference slope 1/2'}], ...
+        'Location','southwest','FontSize',12);
+    grid on; box on;
+end
+
+function annotate_velocity_stall(targetAxes,dxValues,velocityError)
+%ANNOTATE_VELOCITY_STALL labels the flat tail of the velocity curve.
+% Nearly all of the velocity error sits in the few cells at the shock, so the
+% error depends on where the shock falls inside a cell rather than on dx. The
+% label prevents the flat tail from being read as a solver defect.
+
+    if numel(dxValues) < 3; return; end
+    finalOrder = log(velocityError(end-1)/velocityError(end)) / ...
+        log(dxValues(end-1)/dxValues(end));
+    if finalOrder > 0.25; return; end                  % only label a curve that has actually stalled
+    % Anchored one grid in from the edge so the label cannot run past the axes.
+    text(targetAxes,dxValues(end-1),1.35*velocityError(end-1), ...
+        {'u limited by sub-cell','shock position'}, ...
+        'FontSize',12,'FontAngle','italic','Color',[0.35 0.35 0.35], ...
+        'HorizontalAlignment','center','VerticalAlignment','bottom');
+end
+
+function nice_log_ticks(targetAxes)
+%NICE_LOG_TICKS labels a 1-2-5 sequence so more than one decade is readable.
+
+    axisLimits = ylim(targetAxes);
+    decades = floor(log10(axisLimits(1))):ceil(log10(axisLimits(2)));
+    candidates = sort(reshape((10.^decades(:))*[1 2 5],1,[]));
+    tickValues = candidates(candidates >= axisLimits(1) & candidates <= axisLimits(2));
+    if numel(tickValues) < 3; return; end              % keep MATLAB's own ticks if too few remain
+    set(targetAxes,'YTick',tickValues, ...
+        'YTickLabel',compose('%.0e',tickValues),'YMinorTick','on');
 end
